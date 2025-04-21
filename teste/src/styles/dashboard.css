@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+.title-session {
+  color: #000;
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.subtitle-session {
+  color: #999999;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.input-date {
+  background-color: #f1f1f1;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1px solid #868686;
+}
+
+.blocos-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(23%, 1fr));
+  width: 100%;
+  gap: 10px;
+}
+
+.bloco-info {
+  border-radius: 20px;
+  border: 1px solid #d0d0d0;
+  padding: 30px 30px 30px 30px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.text-info {
+  color: #000;
+  font-family: "Inter";
+  font-weight: 300;
+}
+
+.valor-info {
+  color: #000;
+  font-family: "Inter";
+  font-size: 30px;
+  font-weight: 400;
+}
+
+/* Personalize o DateRangePicker */
+
+#date-input {
+  background-color: transparent;
+  padding: 12px 12px;
+  font-size: 15px;
+}
+
+.rs-picker .rs-input-group.rs-input-group-inside {
+  background-color: #f7f7f7;
+  border-color: #e8e8e8;
+  border-radius: 12px;
+}
+
+.rs-picker .rs-input-group:focus-within,
+.rs-picker .rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus,
+.rs-picker .rs-input-group:not(.rs-input-group-disabled):hover {
+  border-color: #000;
+  color: #000;
+}
+
+.rs-input-group-addon svg {
+  font-size: 20px;
+}
+
+.rs-input-group.rs-input-group-inside .rs-input-group-addon:hover {
+  background-color: #f7f7f7;
+}
+.rs-picker .rs-input-group.rs-input-group-inside .rs-input-group-addon {
+  height: 40px;
+  margin-top: 2px;
+  border-radius: 10px;
+}
