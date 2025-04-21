@@ -1,55 +1,34 @@
 "use client";
-
 import {
   Box,
   Stack,
-  Input,
   Heading,
   SimpleGrid,
-  Select,
   Field,
-  Portal,
-  Badge,
-  NativeSelect,
+  Input,
   InputGroup,
+  NativeSelect,
   Switch,
-  Text,
+  Badge,
 } from "@chakra-ui/react";
-import { useForm, Controller } from "react-hook-form";
-
-import { useRef, useState } from "react";
-import { NumericFormat } from "react-number-format";
+import { useState } from "react";
+import { Controller } from "react-hook-form";
 import { withMask } from "use-mask-input";
 import { HiCheck, HiX } from "react-icons/hi";
+import { NumericFormat } from "react-number-format";
 
-export default function ClienteModal() {
-  const [tipoPessoa, setTipoPessoa] = useState("");
+export default function ClienteModal({
+  register,
+  control,
+  handleTipoPessoaChange,
+  errors,
+  tipoPessoa,
+  documentoRef,
+  setValue,
+}) {
   const [checked, setChecked] = useState(true);
-  const documentoRef = useRef(null);
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    control,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-  };
-
-  // Atualiza a máscara do documento quando tipoPessoa muda
-  const handleTipoPessoaChange = (e) => {
-    const valor = e.target.value;
-    setTipoPessoa(valor);
-    setValue("tipoPessoa", valor);
-    setValue("documento", "");
-  };
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form id="formCliente">
       <Stack spacing={6}>
         {/* DADOS CADASTRAIS */}
         <Box>
@@ -63,7 +42,9 @@ export default function ClienteModal() {
               </Field.Label>
               <Input
                 placeholder="Nome completo ou razão social"
-                {...register("nome", { required: "Nome é obrigatório" })}
+                {...register("nome", {
+                  required: "Nome é obrigatório",
+                })}
               />
               <Field.ErrorText>{errors.nome?.message}</Field.ErrorText>
             </Field.Root>
@@ -316,16 +297,6 @@ export default function ClienteModal() {
           </SimpleGrid>
         </Box>
       </Stack>
-
-      {/* Botão para testar envio (opcional) */}
-      <Box mt={6} textAlign="right">
-        <button
-          type="submit"
-          className="px-4 py-2 bg-green-600 text-white rounded-md"
-        >
-          Salvar (Debug)
-        </button>
-      </Box>
     </form>
   );
 }

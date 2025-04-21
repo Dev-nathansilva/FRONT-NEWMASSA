@@ -6,7 +6,6 @@ import {
   Portal,
   CloseButton,
   HStack,
-  ButtonGroup,
 } from "@chakra-ui/react";
 
 import { BsPrinterFill } from "react-icons/bs";
@@ -15,11 +14,45 @@ import { LuPlus } from "react-icons/lu";
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { FiRefreshCcw } from "react-icons/fi";
+import { useForm } from "react-hook-form";
 import ClienteModal from "@/components/modais/ClienteModal";
 
 export default function ClientesPage() {
+  const [tipoPessoa, setTipoPessoa] = useState("");
+
+  const documentoRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
   const fetchDataRef = useRef(null);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log("Form Data:", data);
+  };
+
+  const resetForm = () => {
+    setTipoPessoa("");
+    setValue("tipoPessoa", "");
+    setValue("documento", "");
+    documentoRef.current = null;
+    // Limpa todos os campos do formulário
+    reset();
+  };
+
+  // Atualiza a máscara do documento quando tipoPessoa muda
+  const handleTipoPessoaChange = (e) => {
+    const valor = e.target.value;
+    setTipoPessoa(valor);
+    setValue("tipoPessoa", valor);
+    setValue("documento", "");
+  };
 
   const fetchData = async () => {
     const response = await fetch(
@@ -171,13 +204,22 @@ export default function ClientesPage() {
                           rounded="10px"
                           variant="subtle"
                           colorPalette="gray"
+                          onClick={resetForm}
                         />
                       </HStack>
                     </Dialog.CloseTrigger>
                   </Dialog.Header>
 
                   <Dialog.Body pt={4} pb={6} flex="1" overflowY="auto">
-                    <ClienteModal />
+                    <ClienteModal
+                      register={register}
+                      control={control}
+                      errors={errors}
+                      tipoPessoa={tipoPessoa}
+                      handleTipoPessoaChange={handleTipoPessoaChange}
+                      documentoRef={documentoRef}
+                      setValue={setValue}
+                    />
                   </Dialog.Body>
 
                   <Dialog.Footer
@@ -191,6 +233,9 @@ export default function ClientesPage() {
                       </Button>
                     </Dialog.ActionTrigger>
                     <Button
+                      type="submit"
+                      onClick={handleSubmit(onSubmit)}
+                      form="formCliente"
                       className="!text-white"
                       rounded="5px"
                       colorPalette="green"
