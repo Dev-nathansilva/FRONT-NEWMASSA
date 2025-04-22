@@ -19,7 +19,6 @@ import ClienteModal from "@/components/modais/ClienteModal";
 
 export default function ClientesPage() {
   const [tipoPessoa, setTipoPessoa] = useState("");
-
   const documentoRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
   const fetchDataRef = useRef(null);
@@ -42,7 +41,6 @@ export default function ClientesPage() {
     setValue("tipoPessoa", "");
     setValue("documento", "");
     documentoRef.current = null;
-    // Limpa todos os campos do formulário
     reset();
   };
 
@@ -228,7 +226,11 @@ export default function ClientesPage() {
                     gap={3}
                   >
                     <Dialog.ActionTrigger asChild>
-                      <Button rounded="5px" variant="surface">
+                      <Button
+                        rounded="5px"
+                        variant="surface"
+                        onClick={resetForm}
+                      >
                         Cancelar
                       </Button>
                     </Dialog.ActionTrigger>

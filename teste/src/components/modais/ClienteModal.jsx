@@ -16,6 +16,7 @@ import { Controller } from "react-hook-form";
 import { withMask } from "use-mask-input";
 import { HiCheck, HiX } from "react-icons/hi";
 import { NumericFormat } from "react-number-format";
+import { useEffect } from "react";
 
 export default function ClienteModal({
   register,
@@ -27,6 +28,11 @@ export default function ClienteModal({
   setValue,
 }) {
   const [checked, setChecked] = useState(true);
+
+  useEffect(() => {
+    setValue("credito", 0);
+  }, [setValue]);
+
   return (
     <form id="formCliente">
       <Stack spacing={6}>
@@ -254,10 +260,20 @@ export default function ClienteModal({
 
             <Field.Root>
               <Field.Label>CEP</Field.Label>
-              <Input
-                placeholder="00000-000"
-                ref={withMask("99999-999")}
-                {...register("cep")}
+              <Controller
+                name="cep"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="00000-000"
+                    ref={(el) => {
+                      field.ref(el);
+                      if (el) withMask("99999-999")(el);
+                    }}
+                  />
+                )}
               />
             </Field.Root>
           </SimpleGrid>
@@ -288,6 +304,7 @@ export default function ClienteModal({
                   fixedDecimalScale
                   allowNegative={false}
                   placeholder="0,00"
+                  {...register("credito")}
                   onValueChange={(values) =>
                     setValue("credito", values.floatValue || 0)
                   }

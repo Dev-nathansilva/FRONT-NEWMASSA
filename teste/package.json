@@ -32,6 +32,7 @@
     "react-input-mask": "^2.0.4",
     "react-map-gl": "^8.0.1",
     "react-number-format": "^5.4.4",
+    "react-select": "^5.10.1",
     "recharts": "^2.15.1",
     "rsuite": "^5.78.0",
     "use-mask-input": "^3.4.2",
