@@ -21,9 +21,9 @@ import { useEffect } from "react";
 export default function ClienteModal({
   register,
   control,
-  handleTipoPessoaChange,
+  handleTipoChange,
   errors,
-  tipoPessoa,
+  tipo,
   documentoRef,
   setValue,
 }) {
@@ -32,6 +32,10 @@ export default function ClienteModal({
   useEffect(() => {
     setValue("credito", 0);
   }, [setValue]);
+
+  useEffect(() => {
+    setValue("status", checked === true ? "Ativo" : "Inativo");
+  }, [checked]);
 
   return (
     <form id="formCliente">
@@ -56,11 +60,11 @@ export default function ClienteModal({
             </Field.Root>
 
             <Controller
-              name="tipoPessoa"
+              name="tipo"
               control={control}
               rules={{ required: "Selecione um item da lista" }}
               render={({ field }) => (
-                <Field.Root required invalid={!!errors.tipoPessoa}>
+                <Field.Root required invalid={!!errors.tipo}>
                   <Field.Label>
                     Tipo de Pessoa <Field.RequiredIndicator />
                   </Field.Label>
@@ -69,7 +73,7 @@ export default function ClienteModal({
                       {...field}
                       onChange={(e) => {
                         field.onChange(e);
-                        handleTipoPessoaChange(e); // ainda atualiza o state e reseta o documento
+                        handleTipoChange(e); // ainda atualiza o state e reseta o documento
                       }}
                     >
                       <option value="">Selecione um tipo</option>
@@ -78,9 +82,7 @@ export default function ClienteModal({
                     </NativeSelect.Field>
                     <NativeSelect.Indicator />
                   </NativeSelect.Root>
-                  <Field.ErrorText>
-                    {errors.tipoPessoa?.message}
-                  </Field.ErrorText>
+                  <Field.ErrorText>{errors.tipo?.message}</Field.ErrorText>
                 </Field.Root>
               )}
             />
@@ -97,14 +99,11 @@ export default function ClienteModal({
                   validate: (value) => {
                     const onlyNumbers = value.replace(/\D/g, "");
 
-                    if (
-                      tipoPessoa === "PessoaFisica" &&
-                      onlyNumbers.length !== 11
-                    ) {
+                    if (tipo === "PessoaFisica" && onlyNumbers.length !== 11) {
                       return "CPF inválido";
                     }
 
-                    if (tipoPessoa === "Empresa" && onlyNumbers.length !== 14) {
+                    if (tipo === "Empresa" && onlyNumbers.length !== 14) {
                       return "CNPJ inválido";
                     }
 
@@ -115,15 +114,15 @@ export default function ClienteModal({
                   <Input
                     {...field}
                     value={field.value || ""}
-                    disabled={!tipoPessoa}
+                    disabled={!tipo}
                     placeholder="Digite o CPF ou CNPJ"
                     ref={(el) => {
                       field.ref(el);
                       documentoRef.current = el;
                       if (el) {
-                        if (tipoPessoa === "PessoaFisica") {
+                        if (tipo === "PessoaFisica") {
                           withMask("999.999.999-99")(el);
-                        } else if (tipoPessoa === "Empresa") {
+                        } else if (tipo === "Empresa") {
                           withMask("99.999.999/9999-99")(el);
                         }
                       }
@@ -289,7 +288,7 @@ export default function ClienteModal({
               <Field.Label>Observações</Field.Label>
               <Input
                 placeholder="Observações..."
-                {...register("observacoes")}
+                // {...register("observacoes")}
               />
             </Field.Root>
 

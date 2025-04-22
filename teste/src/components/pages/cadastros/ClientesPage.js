@@ -16,9 +16,10 @@ import * as XLSX from "xlsx";
 import { FiRefreshCcw } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import ClienteModal from "@/components/modais/ClienteModal";
+import { toaster } from "@/components/ui/toaster";
 
 export default function ClientesPage() {
-  const [tipoPessoa, setTipoPessoa] = useState("");
+  const [tipo, setTipo] = useState("");
   const documentoRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
   const fetchDataRef = useRef(null);
@@ -32,23 +33,62 @@ export default function ClientesPage() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (data) => {
+    const payload = {
+      ...data,
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/clientes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toaster.create({
+          title: "Cliente Novo!",
+          description: "Cliente Criado com Sucesso",
+          type: "success",
+          duration: 3000,
+        });
+        resetForm();
+        setTableKey((prev) => prev + 1); // atualiza a tabela
+      } else {
+        toaster.create({
+          title: "Erro!",
+          description: `Erro ao criar cliente: ${result.error}`,
+          type: "warning",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      toaster.create({
+        title: "Erro!",
+        description: `Erro ao conectar com o servidor: ${error.message}`,
+        type: "error",
+        duration: 3000,
+      });
+    }
   };
 
   const resetForm = () => {
-    setTipoPessoa("");
-    setValue("tipoPessoa", "");
+    setTipo("");
+    setValue("tipo", "");
     setValue("documento", "");
     documentoRef.current = null;
     reset();
   };
 
   // Atualiza a máscara do documento quando tipoPessoa muda
-  const handleTipoPessoaChange = (e) => {
+  const handleTipoChange = (e) => {
     const valor = e.target.value;
-    setTipoPessoa(valor);
-    setValue("tipoPessoa", valor);
+    setTipo(valor);
+    setValue("tipo", valor);
     setValue("documento", "");
   };
 
@@ -213,8 +253,8 @@ export default function ClientesPage() {
                       register={register}
                       control={control}
                       errors={errors}
-                      tipoPessoa={tipoPessoa}
-                      handleTipoPessoaChange={handleTipoPessoaChange}
+                      tipo={tipo}
+                      handleTipoChange={handleTipoChange}
                       documentoRef={documentoRef}
                       setValue={setValue}
                     />
