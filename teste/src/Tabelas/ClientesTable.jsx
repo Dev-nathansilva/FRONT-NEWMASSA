@@ -1,7 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import CustomTable from "../components/CustomTable";
 import debounce from "lodash.debounce";
 import { Toaster, toaster } from "@/components/ui/toaster";
+import { FaUserCircle } from "react-icons/fa";
+import { BsClipboardFill } from "react-icons/bs";
+
 import {
   BsChevronExpand,
   BsFillCaretUpFill,
@@ -12,6 +15,8 @@ import { FiMail, FiEdit, FiTrash2, FiRefreshCcw, FiEye } from "react-icons/fi";
 import usePopupManager from "../hooks/popupmanager";
 import { useCallback } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import { GoOrganization } from "react-icons/go";
+
 import { IoClose } from "react-icons/io5";
 import "../../src/styles/Pages.css";
 import {
@@ -23,6 +28,8 @@ import {
   FaEdit,
   FaWhatsapp,
 } from "react-icons/fa";
+import { Button, CloseButton, Drawer } from "@chakra-ui/react";
+import { MdOutlineLabel } from "react-icons/md";
 
 const filtrosIniciais = {
   status: [],
@@ -40,12 +47,12 @@ export default function ClientesTable({ fetchDataRef }) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
   const [linhaSelecionada, setLinhaSelecionada] = useState(null);
-  const [mostrarPopup, setMostrarPopup] = useState(false);
   const [selectionResetKey, setSelectionResetKey] = useState(0);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const abrirPopupComDados = (linha) => {
+  const abrirDrawerComDados = (linha) => {
     setLinhaSelecionada(linha);
-    setMostrarPopup(true);
+    setIsDrawerOpen(true);
   };
 
   const debouncedSearchHandler = useCallback(
@@ -524,7 +531,7 @@ export default function ClientesTable({ fetchDataRef }) {
           <div className="flex gap-1 !text-[19px]">
             <div
               className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg"
-              onClick={() => abrirPopupComDados(row.original)}
+              onClick={() => abrirDrawerComDados(row.original)}
             >
               <FiEye className=" text-black" title="Visualizar" />
             </div>
@@ -688,9 +695,37 @@ export default function ClientesTable({ fetchDataRef }) {
     }
   }, [fetchData, fetchDataRef]);
 
+  const drawerContentRef = useRef(null);
+
   useEffect(() => {
-    console.log(selectedRows);
-  }, [selectedRows]);
+    const handleOutsideClick = (event) => {
+      if (
+        drawerContentRef.current &&
+        !drawerContentRef.current.contains(event.target)
+      ) {
+        setIsDrawerOpen(false); // Fecha o Drawer se clicar fora do conteúdo
+      }
+    };
+
+    // Adiciona o eventListener quando o componente for montado
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    // Remove o eventListener quando o componente for desmontado
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
+  const Field = ({ label, value, icon }) => (
+    <div className=" !pb-2 !flex flex-col gap-1 !border-b ">
+      <div className="!flex gap-2 !text-xs !text-gray-500">
+        {icon} {label}
+      </div>
+      <div className="!text-sm !font-medium !text-gray-800 !mt-1 truncate">
+        {value}
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -773,122 +808,145 @@ export default function ClientesTable({ fetchDataRef }) {
         </div>
       )}
 
-      {mostrarPopup && linhaSelecionada && (
-        <div
-          className="fixed inset-0 z-[1000] flex justify-end"
-          onClick={() => setMostrarPopup(false)}
-        >
-          <div
-            className="bg-white w-full max-w-[300px] h-screen shadow-2xl flex flex-col relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Botão Fechar */}
-            <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
-              onClick={() => setMostrarPopup(false)}
-            >
-              <IoClose size={24} />
-            </button>
+      {linhaSelecionada && (
+        <Drawer.Root open={isDrawerOpen}>
+          <Drawer.Backdrop
+            className="!bg-[#00000021]"
+            onClick={() => setIsDrawerOpen(false)}
+          />
+          <Drawer.Positioner>
+            <Drawer.Content ref={drawerContentRef}>
+              <CloseButton
+                className="!absolute !top-2 !right-4 w-1 !text-gray-600 !bg-gray-100 hover:!bg-gray-200 !rounded-[10px] transition"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                }}
+              >
+                <IoClose size={24} />
+              </CloseButton>
 
-            {/* Cabeçalho */}
-            <div className="!px-6 !pt-6 !pb-4 !border-b">
-              <h2 className="!text-[20px] !font-semibold !text-gray-800">
-                Detalhes do Cliente
-              </h2>
-            </div>
+              <Drawer.Header className="!px-6 !pt-6 !pb-4 !border-b">
+                <h2 className="!text-[20px] !font-semibold !text-gray-800 flex gap-3 items-center">
+                  <FaUserCircle /> Cliente
+                </h2>
+              </Drawer.Header>
 
-            {/* Conteúdo scrollável */}
-            <div className="flex-grow overflow-y-auto !pb-[100px] !px-6 !py-4 !space-y-4 !text-sm !text-gray-700">
-              <div className="flex items-center gap-2">
-                <FaIdCard className="text-gray-500" />
-                <span>
-                  <strong>ID:</strong> {linhaSelecionada.id}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaUser className="text-gray-500" />
-                <span>
-                  <strong>Nome:</strong> {linhaSelecionada.Nome}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaAddressCard className="text-gray-500" />
-                <span>
-                  <strong>CPF/CNPJ:</strong> {linhaSelecionada["CPF/CNPJ"]}
-                </span>
-              </div>
-              <div>
-                <strong>Tipo:</strong> {linhaSelecionada.Tipo}
-              </div>
-              <div>
-                <strong>Status:</strong>{" "}
-                <span
-                  className={`inline-block !px-2 !py-0.5 rounded-full text-xs font-medium ${
-                    linhaSelecionada.status === "Ativo"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {linhaSelecionada.status}
-                </span>
-              </div>
-              {linhaSelecionada.Email && (
-                <div className="flex items-center gap-2">
-                  <FaEnvelope className="text-gray-500" />
-                  <span>
-                    <strong>Email:</strong> {linhaSelecionada.Email}
-                  </span>
+              <Drawer.Body className="!flex-grow !overflow-y-auto !pb-[100px] !px-6 !py-4 !space-y-6 !text-sm !text-gray-700">
+                {/* Nome no topo com destaque */}
+
+                <div className="flex justify-between items-center !mb-4 ">
+                  <div className="!text-xs !text-gray-500 !uppercase !mb-0">
+                    Código (ID)
+                  </div>
+                  <div className=" !text-[13px] !py-2 !px-5 !font-bold !text-gray-700 !bg-gray-100  !rounded-lg !inline-block ">
+                    {" "}
+                    {linhaSelecionada.id}
+                  </div>
                 </div>
-              )}
-              {linhaSelecionada["Inscricao Estadual"] && (
+
+                <div className="!w-full !text-center !text-[14px] !text-gray-800 !font-semibold !bg-gray-100 !px-3 !py-4 !border !border-gray-400 !rounded-lg !inline-block">
+                  {linhaSelecionada.Nome}
+                </div>
+
+                {/* Seção 1 - Dados Cadastrais */}
                 <div>
-                  <strong>Inscrição Estadual:</strong>{" "}
-                  {linhaSelecionada["Inscricao Estadual"]}
+                  <h3 className="!bg-gray-100 !text-center !py-2 rounded-[10px] !text-sm !font-bold !text-gray-600 !mb-4">
+                    Dados Cadastrais
+                  </h3>
+                  <div className="!space-y-4">
+                    <Field
+                      label="CPF/CNPJ"
+                      value={linhaSelecionada["CPF/CNPJ"]}
+                      icon={<FaAddressCard className="text-gray-500" />}
+                    />
+                    <Field
+                      label="Tipo"
+                      value={linhaSelecionada.Tipo}
+                      icon={<BsClipboardFill />}
+                    />
+                    <Field
+                      label="Status"
+                      icon={<MdOutlineLabel />}
+                      value={
+                        <span
+                          className={`!inline-block !px-2 !py-0.5 !rounded-full !text-xs !font-medium ${
+                            linhaSelecionada.status === "Ativo"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {linhaSelecionada.status}
+                        </span>
+                      }
+                    />
+                    {linhaSelecionada.Email && (
+                      <Field
+                        label="Email"
+                        value={linhaSelecionada.Email}
+                        icon={<FaEnvelope className="text-gray-500" />}
+                      />
+                    )}
+                    {linhaSelecionada["Inscricao Estadual"] && (
+                      <Field
+                        label="Inscrição Estadual"
+                        icon={<GoOrganization />}
+                        value={linhaSelecionada["Inscricao Estadual"]}
+                      />
+                    )}
+                    {linhaSelecionada["Data de Cadastro"] && (
+                      <Field
+                        icon={<FaCalendarAlt className="text-gray-500" />}
+                        label="Data de Cadastro"
+                        value={linhaSelecionada["Data de Cadastro"]}
+                      />
+                    )}
+                  </div>
                 </div>
-              )}
-              {linhaSelecionada["Data de Cadastro"] && (
-                <div className="flex items-center gap-2">
-                  <FaCalendarAlt className="text-gray-500" />
-                  <span>
-                    <strong>Data de Cadastro:</strong>{" "}
-                    {linhaSelecionada["Data de Cadastro"]}
-                  </span>
+
+                {/* Seção 2 - Endereços */}
+                <div>
+                  <h3 className="!bg-gray-100 !text-center !py-2 rounded-[10px] !text-sm !font-bold !text-gray-600 !mb-4">
+                    Endereços
+                  </h3>
+                  <div className="!space-y-4">
+                    <Field label="Endereço" value={linhaSelecionada.Endereço} />
+                    <Field label="Cidade" value={linhaSelecionada.Cidade} />
+                    <Field label="CEP" value={linhaSelecionada.CEP} />
+                    <Field label="Bairro" value={linhaSelecionada.Bairro} />
+                    <Field
+                      label="Complemento"
+                      value={linhaSelecionada.Complemento}
+                    />
+                  </div>
                 </div>
-              )}
-              <div>
-                <strong>Endereço:</strong> {linhaSelecionada.Endereço}
-              </div>
-              <div>
-                <strong>Cidade:</strong> {linhaSelecionada.Cidade}
-              </div>
-              <div>
-                <strong>CEP:</strong> {linhaSelecionada.CEP}
-              </div>
-              <div>
-                <strong>Bairro:</strong> {linhaSelecionada.Bairro}
-              </div>
-              <div>
-                <strong>Complemento:</strong> {linhaSelecionada.Complemento}
-              </div>
 
-              <div>
-                <strong>Crédito:</strong> R$ {linhaSelecionada.Credito}
-              </div>
-            </div>
+                {/* Seção 3 - Informações Adicionais */}
+                <div>
+                  <h3 className="!bg-gray-100 !text-center !py-2 rounded-[10px] !text-sm !font-bold !text-gray-600 !mb-4">
+                    Informações Adicionais
+                  </h3>
+                  <div className="!space-y-4">
+                    <Field
+                      label="Crédito"
+                      value={`R$ ${linhaSelecionada.Credito}`}
+                    />
+                  </div>
+                </div>
+              </Drawer.Body>
 
-            {/* Rodapé fixo */}
-            <div className="w-full !px-6 !py-4 !border-t flex flex-col gap-3 bg-white">
-              <button className="flex items-center justify-center gap-2 !bg-blue-600 hover:!bg-blue-700 !text-white !font-semibold !py-3 !rounded-lg transition">
-                <FaEdit className="!text-[20px]" />
-                Editar Informações
-              </button>
-              <button className="flex items-center justify-center gap-2 !bg-green-500 hover:!bg-green-600 !text-white !font-semibold !py-3 !rounded-lg transition">
-                <FaWhatsapp className="!text-[20px]" />
-                Enviar Mensagem
-              </button>
-            </div>
-          </div>
-        </div>
+              <Drawer.Footer className="!w-full !px-6 !py-4 !border-t flex flex-col gap-3 bg-white">
+                <button className="!w-full flex items-center justify-center gap-2 !bg-blue-600 hover:!bg-blue-700 !text-white !font-semibold !py-3 !rounded-lg transition">
+                  <FaEdit className="!text-[20px]" />
+                  Editar Informações
+                </button>
+                <button className="!w-full flex items-center justify-center gap-2 !bg-green-500 hover:!bg-green-600 !text-white !font-semibold !py-3 !rounded-lg transition">
+                  <FaWhatsapp className="!text-[20px]" />
+                  Enviar Mensagem
+                </button>
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer.Positioner>
+        </Drawer.Root>
       )}
     </div>
   );
