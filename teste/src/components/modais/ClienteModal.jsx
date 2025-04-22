@@ -39,13 +39,20 @@ export default function ClienteModal({
 
   return (
     <form id="formCliente">
-      <Stack spacing={6}>
+      <Stack spacing={6} className="!flex !flex-col !gap-10">
         {/* DADOS CADASTRAIS */}
         <Box>
-          <Heading fontSize="md" mb={4}>
+          <Heading
+            fontSize="md"
+            mb={4}
+            className="w-full !bg-gray-100 rounded-[5px] !pl-3 !border"
+          >
             Dados Cadastrais
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2 }} className="gap-x-10 gap-y-3">
+          <SimpleGrid
+            columns={{ base: 1, md: 2 }}
+            className="gap-x-10 gap-y-3 !px-3"
+          >
             <Field.Root required invalid={!!errors.nome}>
               <Field.Label>
                 Nome <Field.RequiredIndicator />{" "}
@@ -197,7 +204,7 @@ export default function ClienteModal({
 
             <Field.Root
               orientation="horizontal"
-              className="!flex !justify-start !w-[210px] !p-2 !mt-3 !mb-5 !border !border-gray-200 rounded-full"
+              className="!flex !justify-start !w-[210px] !p-2 !mt-3  !border !border-gray-200 rounded-full"
             >
               <Field.Label>Status</Field.Label>
               <Switch.Root
@@ -221,10 +228,17 @@ export default function ClienteModal({
 
         {/* ENDEREÇO */}
         <Box>
-          <Heading fontSize="md" mb={4}>
+          <Heading
+            fontSize="md"
+            mb={4}
+            className="w-full !bg-gray-100 rounded-[5px] !pl-3"
+          >
             Endereço
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2 }} className="gap-x-10 gap-y-3">
+          <SimpleGrid
+            columns={{ base: 1, md: 2 }}
+            className="gap-x-10 gap-y-3 !px-3"
+          >
             <Field.Root>
               <Field.Label>Endereço</Field.Label>
               <Input
@@ -280,10 +294,17 @@ export default function ClienteModal({
 
         {/* INFORMAÇÕES ADICIONAIS */}
         <Box>
-          <Heading fontSize="md" mb={4}>
+          <Heading
+            fontSize="md"
+            mb={4}
+            className="w-full !bg-gray-100 rounded-[5px] !pl-3"
+          >
             Informações Adicionais
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2 }} className="gap-x-10 gap-y-3">
+          <SimpleGrid
+            columns={{ base: 1, md: 2 }}
+            className="gap-x-10 gap-y-3 !px-3"
+          >
             <Field.Root>
               <Field.Label>Observações</Field.Label>
               <Input

@@ -11,6 +11,8 @@ import {
 import { BsPrinterFill } from "react-icons/bs";
 import { IoPeopleSharp } from "react-icons/io5";
 import { LuPlus } from "react-icons/lu";
+import { BsPersonFillAdd } from "react-icons/bs";
+
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { FiRefreshCcw } from "react-icons/fi";
@@ -231,15 +233,20 @@ export default function ClientesPage() {
                     display="flex"
                     alignItems="center"
                     justifyContent="space-between"
+                    className="!border-b"
                   >
                     <Box
                       display="flex"
                       alignItems="center"
-                      gap={2}
-                      className="bg-[#e9e9e9] !px-5 rounded-[10px]"
+                      gap={3}
+                      className="bg-[#f1f1f1] !px-4 !py-2  rounded-[10px] !border !border-[#5e5e5e] shadow-md"
                     >
-                      <LuPlus size={20} />
-                      <Dialog.Title fontWeight="bold" fontSize="lg">
+                      <BsPersonFillAdd size={25} />
+                      <Dialog.Title
+                        fontWeight="bold"
+                        fontSize="lg"
+                        className="!leading-0 "
+                      >
                         Adicionar Novo Cliente
                       </Dialog.Title>
                     </Box>
