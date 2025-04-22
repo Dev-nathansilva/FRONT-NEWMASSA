@@ -13,7 +13,7 @@ import { LuPlus } from "react-icons/lu";
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { FiRefreshCcw } from "react-icons/fi";
-import ClienteModal from "@/components/Modal";
+// import ClienteModal from "@/components/Modal";
 import FornecedoresTable from "@/Tabelas/FornecedoresTable";
 
 export default function FornecedoresPage() {
@@ -169,7 +169,7 @@ export default function FornecedoresPage() {
 
                   <Dialog.Body pt={4} pb={6} flex="1" overflowY="auto">
                     {/* Aqui você pode colocar o conteúdo do formulário ou importar o <ClienteModal /> */}
-                    <ClienteModal />
+                    {/* <ClienteModal /> */}
                   </Dialog.Body>
 
                   <Dialog.Footer

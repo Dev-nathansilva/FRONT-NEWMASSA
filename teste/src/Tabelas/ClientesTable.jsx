@@ -41,6 +41,7 @@ export default function ClientesTable({ fetchDataRef }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [linhaSelecionada, setLinhaSelecionada] = useState(null);
   const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [selectionResetKey, setSelectionResetKey] = useState(0);
 
   const abrirPopupComDados = (linha) => {
     setLinhaSelecionada(linha);
@@ -687,6 +688,10 @@ export default function ClientesTable({ fetchDataRef }) {
     }
   }, [fetchData, fetchDataRef]);
 
+  useEffect(() => {
+    console.log(selectedRows);
+  }, [selectedRows]);
+
   return (
     <div>
       <CustomTable
@@ -716,19 +721,20 @@ export default function ClientesTable({ fetchDataRef }) {
         onRowSelectionChange={(selectedRows) => {
           setSelectedRows(selectedRows);
         }}
+        externalRowSelectionResetKey={selectionResetKey}
       />
 
       <Toaster />
 
       {selectedRows.length > 0 && (
-        <div className="fixed bottom-4 left-[50%] -translate-x-1/2 bg-white shadow-lg border border-gray-300 rounded-lg px-6 py-4 z-50 flex items-center gap-4 animate-fade-in">
-          <span className="text-sm">
+        <div className="fixed bottom-4 left-[50%] -translate-x-1/2 bg-white shadow-lg !border !border-gray-300 rounded-lg !px-6 !py-4 !z-50 !flex !items-center gap-4 animate-fade-in">
+          <span className="!text-sm">
             {selectedRows.length} cliente{selectedRows.length > 1 ? "s" : ""}{" "}
             selecionado
             {selectedRows.length > 1 ? "s" : ""}
           </span>
           <button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 text-sm rounded"
+            className="!bg-red-500 hover:!bg-red-600 !text-white !px-4 !py-1.5 !text-sm !rounded"
             onClick={async () => {
               const confirm = window.confirm(
                 `Tem certeza que deseja deletar ${selectedRows.length} cliente(s)?`
@@ -752,7 +758,8 @@ export default function ClientesTable({ fetchDataRef }) {
                     duration: 3000,
                   });
                   fetchData(); // atualiza a lista
-                  setSelectedRows([]); // limpa seleção
+                  setSelectedRows([]);
+                  setSelectionResetKey((prev) => prev + 1);
                 } else {
                   throw new Error("Erro ao deletar clientes.");
                 }

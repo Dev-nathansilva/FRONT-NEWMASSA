@@ -23,6 +23,7 @@ export default function ClientesPage() {
   const documentoRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
   const fetchDataRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     register,
@@ -50,14 +51,15 @@ export default function ClientesPage() {
       const result = await response.json();
 
       if (response.ok) {
+        resetForm();
+        setTableKey((prev) => prev + 1); // atualiza a tabela
+        setIsModalOpen(false);
         toaster.create({
           title: "Cliente Novo!",
           description: "Cliente Criado com Sucesso",
           type: "success",
           duration: 3000,
         });
-        resetForm();
-        setTableKey((prev) => prev + 1); // atualiza a tabela
       } else {
         toaster.create({
           title: "Erro!",
@@ -199,15 +201,20 @@ export default function ClientesPage() {
             </Portal>
           </Dialog.Root>
 
-          <Dialog.Root size="cover" placement="center" motionPreset="scale">
-            <Dialog.Trigger asChild>
-              <Button
-                className="!bg-blue-600 hover:!bg-blue-700 !text-white !px-4 !rounded-md"
-                variant="solid"
-              >
-                <LuPlus /> Adicionar Novo
-              </Button>
-            </Dialog.Trigger>
+          <Dialog.Root
+            size="cover"
+            placement="center"
+            motionPreset="scale"
+            open={isModalOpen}
+            onOpenChange={setIsModalOpen}
+          >
+            <Button
+              className="!bg-blue-600 hover:!bg-blue-700 !text-white !px-4 !rounded-md"
+              variant="solid"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <LuPlus /> Adicionar Novo
+            </Button>
 
             <Portal>
               <Dialog.Backdrop />
@@ -236,16 +243,17 @@ export default function ClientesPage() {
                         Adicionar Novo Cliente
                       </Dialog.Title>
                     </Box>
-                    <Dialog.CloseTrigger asChild>
-                      <HStack>
-                        <CloseButton
-                          rounded="10px"
-                          variant="subtle"
-                          colorPalette="gray"
-                          onClick={resetForm}
-                        />
-                      </HStack>
-                    </Dialog.CloseTrigger>
+                    <HStack>
+                      <CloseButton
+                        rounded="10px"
+                        variant="subtle"
+                        colorPalette="gray"
+                        onClick={() => {
+                          resetForm();
+                          setIsModalOpen(false); // FECHA O MODAL
+                        }}
+                      />
+                    </HStack>
                   </Dialog.Header>
 
                   <Dialog.Body pt={4} pb={6} flex="1" overflowY="auto">
@@ -265,15 +273,16 @@ export default function ClientesPage() {
                     justifyContent="flex-end"
                     gap={3}
                   >
-                    <Dialog.ActionTrigger asChild>
-                      <Button
-                        rounded="5px"
-                        variant="surface"
-                        onClick={resetForm}
-                      >
-                        Cancelar
-                      </Button>
-                    </Dialog.ActionTrigger>
+                    <Button
+                      rounded="5px"
+                      variant="surface"
+                      onClick={() => {
+                        resetForm();
+                        setIsModalOpen(false); // FECHA O MODAL
+                      }}
+                    >
+                      Cancelar
+                    </Button>
                     <Button
                       type="submit"
                       onClick={handleSubmit(onSubmit)}

@@ -46,10 +46,16 @@ export default function CustomTable({
   onSearchChange,
   debouncedSearchHandler,
   onRowSelectionChange,
+  externalRowSelectionResetKey,
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters] = useState([]);
   const [enableDragging, setEnableDragging] = useState(false);
+
+  useEffect(() => {
+    // sempre que a key mudar, zera a seleção
+    setRowSelection({});
+  }, [externalRowSelectionResetKey]);
 
   const popupKeys = ["func", "columns"];
   const { popupStates, popupRefs, togglePopup, closePopup } =
