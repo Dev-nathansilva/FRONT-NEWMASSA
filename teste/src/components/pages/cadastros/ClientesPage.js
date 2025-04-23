@@ -103,11 +103,13 @@ export default function ClientesPage() {
   };
 
   const resetForm = () => {
-    setTipo("");
-    setValue("tipo", "");
-    setValue("documento", "");
-    documentoRef.current = null;
-    reset();
+    setTimeout(() => {
+      setTipo("");
+      setValue("tipo", "");
+      setValue("documento", "");
+      documentoRef.current = null;
+      reset();
+    }, 1000);
   };
 
   // Atualiza a máscara do documento quando tipoPessoa muda
@@ -163,9 +165,24 @@ export default function ClientesPage() {
     if (clienteEditando) {
       setIsModalOpen(true);
       preencherFormulario(clienteEditando);
-      console.log(clienteEditando);
+      // console.log(clienteEditando);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clienteEditando]);
+
+  const handleCloseModalComConfirmacao = () => {
+    if (isDirty) {
+      const confirmacao = window.confirm(
+        "Você tem alterações não salvas. Tem certeza que deseja fechar? Os dados serão perdidos."
+      );
+      if (!confirmacao) return;
+    }
+
+    // se não tiver alterações ou usuário confirmou
+    setIsModalOpen(false);
+    setClienteEditando(null);
+    resetForm();
+  };
 
   return (
     <div>
@@ -319,11 +336,7 @@ export default function ClientesPage() {
                         rounded="10px"
                         variant="subtle"
                         colorPalette="gray"
-                        onClick={() => {
-                          setIsModalOpen(false); // FECHA O MODAL
-                          resetForm();
-                          setClienteEditando(null);
-                        }}
+                        onClick={handleCloseModalComConfirmacao}
                       />
                     </HStack>
                   </Dialog.Header>
@@ -348,11 +361,7 @@ export default function ClientesPage() {
                     <Button
                       rounded="5px"
                       variant="surface"
-                      onClick={() => {
-                        setIsModalOpen(false); // FECHA O MODAL
-                        resetForm();
-                        setClienteEditando(null);
-                      }}
+                      onClick={handleCloseModalComConfirmacao}
                     >
                       Cancelar
                     </Button>
