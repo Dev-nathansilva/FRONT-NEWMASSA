@@ -47,6 +47,7 @@ export default function CustomTable({
   debouncedSearchHandler,
   onRowSelectionChange,
   externalRowSelectionResetKey,
+  onRowDoubleClick,
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters] = useState([]);
@@ -436,6 +437,7 @@ export default function CustomTable({
                   table.getRowModel().rows.map((row) => (
                     <tr
                       key={row.id}
+                      onDoubleClick={() => onRowDoubleClick?.(row.original)}
                       className={`!rounded-[10px] shadow-xs  ${
                         row.getIsSelected()
                           ? "bg-blue-100"

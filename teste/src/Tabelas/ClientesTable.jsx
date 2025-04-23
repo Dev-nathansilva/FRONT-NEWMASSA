@@ -29,7 +29,7 @@ import {
   FaEdit,
   FaWhatsapp,
 } from "react-icons/fa";
-import { Button, CloseButton, Drawer } from "@chakra-ui/react";
+import { Badge, Button, CloseButton, Drawer } from "@chakra-ui/react";
 import { MdOutlineLabel } from "react-icons/md";
 
 const filtrosIniciais = {
@@ -800,6 +800,7 @@ export default function ClientesTable({
           setSelectedRows(selectedRows);
         }}
         externalRowSelectionResetKey={selectionResetKey}
+        onRowDoubleClick={abrirDrawerComDados}
       />
 
       {selectedRows.length > 0 && (
@@ -934,13 +935,17 @@ export default function ClientesTable({
                         icon={<FaPhone className="text-gray-500" />}
                       />
                     )}
-                    {linhaSelecionada["Inscricao Estadual"] && (
-                      <Field
-                        label="Inscrição Estadual"
-                        icon={<GoOrganization />}
-                        value={linhaSelecionada["Inscricao Estadual"]}
-                      />
-                    )}
+
+                    <Field
+                      label="Inscrição Estadual"
+                      icon={<GoOrganization />}
+                      value={
+                        linhaSelecionada["Inscricao Estadual"]
+                          ?.toString()
+                          .trim() || "-"
+                      }
+                    />
+
                     {linhaSelecionada["Data de Cadastro"] && (
                       <Field
                         icon={<FaCalendarAlt className="text-gray-500" />}
@@ -957,13 +962,22 @@ export default function ClientesTable({
                     Endereços
                   </h3>
                   <div className="!space-y-4">
-                    <Field label="Endereço" value={linhaSelecionada.Endereço} />
-                    <Field label="Cidade" value={linhaSelecionada.Cidade} />
-                    <Field label="CEP" value={linhaSelecionada.CEP} />
-                    <Field label="Bairro" value={linhaSelecionada.Bairro} />
+                    <Field
+                      label="Endereço"
+                      value={linhaSelecionada.Endereço || "-"}
+                    />
+                    <Field
+                      label="Cidade"
+                      value={linhaSelecionada.Cidade || "-"}
+                    />
+                    <Field label="CEP" value={linhaSelecionada.CEP || "-"} />
+                    <Field
+                      label="Bairro"
+                      value={linhaSelecionada.Bairro || "-"}
+                    />
                     <Field
                       label="Complemento"
-                      value={linhaSelecionada.Complemento}
+                      value={linhaSelecionada.Complemento || "-"}
                     />
                   </div>
                 </div>
