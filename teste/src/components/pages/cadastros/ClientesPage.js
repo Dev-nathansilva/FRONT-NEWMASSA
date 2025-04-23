@@ -160,6 +160,7 @@ export default function ClientesPage() {
     setValue("credito", cliente.Credito || "");
     setValue("status", cliente.status || "Inativo");
     setValue("inscricaoEstadual", cliente["Inscricao Estadual"]);
+    setValue("observacoes", cliente["Observações"] || "");
   };
 
   useEffect(() => {

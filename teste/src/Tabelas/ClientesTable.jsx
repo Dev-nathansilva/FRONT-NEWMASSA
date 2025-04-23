@@ -101,6 +101,7 @@ export default function ClientesTable({
     "CEP",
     "Credito",
     "Cidade",
+    "Observações",
   ]);
 
   //PAGINAÇÃO
@@ -127,6 +128,7 @@ export default function ClientesTable({
           "CEP",
           "Credito",
           "Cidade",
+          "Observações",
         ];
       } else if (width <= 1339) {
         newHiddenColumns = [
@@ -141,6 +143,7 @@ export default function ClientesTable({
           "CEP",
           "Credito",
           "Cidade",
+          "Observações",
         ];
       } else if (width <= 1639) {
         newHiddenColumns = [
@@ -154,6 +157,7 @@ export default function ClientesTable({
           "CEP",
           "Credito",
           "Cidade",
+          "Observações",
         ];
       } else if (width <= 1920) {
         newHiddenColumns = [
@@ -166,6 +170,7 @@ export default function ClientesTable({
           "CEP",
           "Credito",
           "Cidade",
+          "Observações",
         ];
       } else {
         newHiddenColumns = [
@@ -178,6 +183,7 @@ export default function ClientesTable({
           "CEP",
           "Credito",
           "Cidade",
+          "Observações",
         ];
       }
 
@@ -260,7 +266,7 @@ export default function ClientesTable({
         status: cliente.status,
         Email: cliente.email,
         Telefone: cliente.telefone,
-        "Inscricao Estadual": cliente.inscricaoEstadual,
+        "Inscrição Estadual": cliente.inscricaoEstadual,
         "Data de Cadastro": formatarData(cliente.dataCadastro),
         dataCadastroRaw: cliente.dataCadastro,
         Endereço: cliente.endereco,
@@ -268,7 +274,8 @@ export default function ClientesTable({
         Bairro: cliente.bairro,
         CEP: cliente.cep,
         Cidade: cliente.cidade,
-        Credito: cliente.credito,
+        ["Crédito"]: cliente.credito,
+        ["Observações"]: cliente.observacoes,
       }));
 
       setClientes(mappedData);
@@ -431,6 +438,7 @@ export default function ClientesTable({
     "Cidade",
     "CEP",
     "Credito",
+    "Observações",
     "status",
     "ações",
   ]);
@@ -524,6 +532,14 @@ export default function ClientesTable({
         enableResizing: true,
         minSize: 200,
       },
+      // COLUNA OBSERVACOES
+      {
+        id: "Observações",
+        accessorKey: "Observações",
+        enableSorting: true,
+        enableResizing: true,
+        minSize: 200,
+      },
 
       // COLUNA STATUS
       {
@@ -606,8 +622,8 @@ export default function ClientesTable({
       // COLUNA INSCRIÇÃO ESTADUAL
       {
         id: "Inscricao Estadual",
-        header: "Inscricao Estadual",
-        accessorKey: "Inscricao Estadual",
+        header: "Inscrição Estadual",
+        accessorKey: "Inscrição Estadual",
         enableHiding: true,
         minSize: 200,
       },
@@ -663,7 +679,7 @@ export default function ClientesTable({
       // COLUNA CREDITO
       {
         id: "Credito",
-        accessorKey: "Credito",
+        accessorKey: "Crédito",
         enableHiding: true,
         minSize: 150,
       },
@@ -873,7 +889,7 @@ export default function ClientesTable({
                 </h2>
               </Drawer.Header>
 
-              <Drawer.Body className="!flex-grow !overflow-y-auto !pb-[100px] !px-6 !py-4 !space-y-6 !text-sm !text-gray-700">
+              <Drawer.Body className="!flex-grow !overflow-y-auto !pb-[70px] !px-6 !py-4 !space-y-6 !text-sm !text-gray-700">
                 {/* Nome no topo com destaque */}
 
                 <div className="flex justify-between items-center !mb-4 ">
@@ -990,7 +1006,12 @@ export default function ClientesTable({
                   <div className="!space-y-4">
                     <Field
                       label="Crédito"
-                      value={`R$ ${linhaSelecionada.Credito}`}
+                      value={`R$ ${linhaSelecionada["Crédito"]}`}
+                    />
+
+                    <Field
+                      label="Observações"
+                      value={linhaSelecionada.Observações || "-"}
                     />
                   </div>
                 </div>

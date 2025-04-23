@@ -89,7 +89,7 @@ export default function CustomTable({
         ref={setNodeRef}
         style={style}
         {...(enableDragging ? { ...attributes, ...listeners } : {})} // Aplica listeners somente se enableDragging for true
-        className={`!px-3 !py-4  !text-left !font-semibold !border !border-gray-200  ${
+        className={`!px-3 !py-4  !text-left !font-semibold !border !border-gray-200   ${
           enableDragging ? "cursor-move" : "cursor-default"
         } bg-[#f9f9f9]`}
       >
@@ -167,6 +167,7 @@ export default function CustomTable({
   const scrollLeft = useRef(0);
 
   const handleMouseDownScroll = (e) => {
+    if (enableDragging) return;
     isDragging.current = true;
     startX.current = e.pageX - scrollRef.current.offsetLeft;
     scrollLeft.current = scrollRef.current.scrollLeft;
@@ -174,17 +175,19 @@ export default function CustomTable({
   };
 
   const handleMouseLeaveScroll = () => {
+    if (enableDragging) return;
     isDragging.current = false;
     scrollRef.current.classList.remove("dragging");
   };
 
   const handleMouseUpScroll = () => {
+    if (enableDragging) return;
     isDragging.current = false;
     scrollRef.current.classList.remove("dragging");
   };
 
   const handleMouseMoveScroll = (e) => {
-    if (!isDragging.current) return;
+    if (enableDragging || !isDragging.current) return;
     e.preventDefault();
     const x = e.pageX - scrollRef.current.offsetLeft;
     const walk = (x - startX.current) * 1.0; // menor fator = mais controlado

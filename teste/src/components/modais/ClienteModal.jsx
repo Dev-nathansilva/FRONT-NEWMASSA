@@ -328,7 +328,7 @@ export default function ClienteModal({
               <Field.Label>Observações</Field.Label>
               <Input
                 placeholder="Observações..."
-                // {...register("observacoes")}
+                {...register("observacoes")}
               />
             </Field.Root>
 
