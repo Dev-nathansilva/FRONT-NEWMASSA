@@ -27,20 +27,25 @@ export default function ClienteModal({
   tipo,
   documentoRef,
   setValue,
+  clienteEditando,
 }) {
   const [checked, setChecked] = useState(true);
 
   const status = useWatch({ control, name: "status" });
 
-  // Atualiza o valor de `checked` só uma vez quando o status for carregado (ex: ao editar)
+  // Carrega o estado inicial do status só uma vez no modo edição
   useEffect(() => {
-    if (status === "Ativo") setChecked(true);
-    else if (status === "Inativo") setChecked(false);
-  }, []); // ← executa só uma vez
+    if (clienteEditando) {
+      if (status === "Ativo") setChecked(true);
+      else if (status === "Inativo") setChecked(false);
+    }
+  }, [clienteEditando]);
 
-  // Atualiza o valor do form quando o usuário mexe no switch
+  // Atualiza o campo do form quando checked mudar
   useEffect(() => {
-    setValue("status", checked ? "Ativo" : "Inativo");
+    setValue("status", checked ? "Ativo" : "Inativo", {
+      shouldDirty: false,
+    });
   }, [checked, setValue]);
 
   return (
@@ -219,7 +224,12 @@ export default function ClienteModal({
               <Switch.Root
                 size="lg"
                 checked={checked}
-                onCheckedChange={(e) => setChecked(e.checked)}
+                onCheckedChange={(e) => {
+                  setChecked(e.checked);
+                  setValue("status", e.checked ? "Ativo" : "Inativo", {
+                    shouldDirty: clienteEditando,
+                  });
+                }}
               >
                 <Switch.HiddenInput />
                 <Switch.Control>

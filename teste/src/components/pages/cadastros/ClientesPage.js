@@ -351,6 +351,7 @@ export default function ClientesPage() {
                       handleTipoChange={handleTipoChange}
                       documentoRef={documentoRef}
                       setValue={setValue}
+                      clienteEditando={clienteEditando}
                     />
                   </Dialog.Body>
 
