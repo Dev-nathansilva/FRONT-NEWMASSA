@@ -13,6 +13,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { BiSolidDashboard, BiSolidReport, BiSolidUser } from "react-icons/bi";
 import LogoutButton from "../LogoutButton";
 import { MdCallEnd } from "react-icons/md";
+import { Portal } from "@chakra-ui/react";
 
 const menuItems = [
   { name: "Dashboard", icon: <BiSolidDashboard /> },
@@ -62,12 +63,13 @@ export default function Sidebar({
   permissions,
 }) {
   const [hoveredMenu, setHoveredMenu] = useState(null);
+  const [submenuPosition, setSubmenuPosition] = useState({ top: 0, left: 0 });
 
   return (
     <Box
       width={isOpen ? "210px" : "100px"}
       transition="width 0.3s"
-      className="sidebar-container"
+      className="sidebar-container overflow-auto"
     >
       <Box>
         <Box mb={6} textAlign="center">
@@ -87,7 +89,14 @@ export default function Sidebar({
               <Box
                 key={item.name}
                 position="relative"
-                onMouseEnter={() => setHoveredMenu(item.name)}
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setSubmenuPosition({
+                    top: rect.top,
+                    left: isOpen ? 195 : 85,
+                  });
+                  setHoveredMenu(item.name);
+                }}
                 onMouseLeave={() => setHoveredMenu(null)}
               >
                 <Box display="flex" flexDirection="column" position="relative">
@@ -130,48 +139,59 @@ export default function Sidebar({
 
                   {/* Submenu */}
                   {item.submenu && hoveredMenu === item.name && (
-                    <Box position="absolute" left={"100%"}>
+                    <Portal>
                       <Box
-                        className="submenu-container"
-                        top="0"
-                        bg="white"
-                        border="1px solid gray.300"
-                        borderRadius="md"
-                        zIndex={10}
-                        ml={2}
-                        minWidth="250px"
+                        position="fixed"
+                        top={submenuPosition.top}
+                        left={submenuPosition.left}
+                        zIndex={1000}
+                        onMouseEnter={() => setHoveredMenu(item.name)}
+                        onMouseLeave={() => setHoveredMenu(null)}
                       >
-                        {/* Adiciona o nome e ícone do menu acima do submenu */}
-                        <Box
-                          className="title-submenu"
-                          display="flex"
-                          alignItems="center"
-                        >
-                          <Box mr={2}>{item.icon}</Box>
-                          <Text>{item.name}</Text>
-                        </Box>
-
-                        {item.submenu.map((sub) => {
-                          if (!hasPermission(permissions, item.name, sub))
-                            return null;
-                          return (
+                        <Box pl="2">
+                          {" "}
+                          {/* Box extra invisível para garantir espaço no hover */}
+                          <Box
+                            bg="white"
+                            border="1px solid"
+                            borderColor="gray.300"
+                            borderRadius="md"
+                            minWidth="250px"
+                            className="submenu-container"
+                          >
                             <Box
-                              key={sub}
+                              className="title-submenu"
+                              display="flex"
+                              alignItems="center"
                               p={2}
-                              className="submenu-item"
-                              borderRadius="md"
-                              cursor="pointer"
-                              _hover={{ bg: "rgba(0,0,0,0.04)" }}
-                              onClick={() =>
-                                setActivePage({ main: item.name, sub })
-                              }
                             >
-                              {sub}
+                              <Box mr={2}>{item.icon}</Box>
+                              <Text>{item.name}</Text>
                             </Box>
-                          );
-                        })}
+
+                            {item.submenu.map((sub) => {
+                              if (!hasPermission(permissions, item.name, sub))
+                                return null;
+                              return (
+                                <Box
+                                  key={sub}
+                                  p={2}
+                                  className="submenu-item"
+                                  borderRadius="md"
+                                  cursor="pointer"
+                                  _hover={{ bg: "rgba(0,0,0,0.04)" }}
+                                  onClick={() =>
+                                    setActivePage({ main: item.name, sub })
+                                  }
+                                >
+                                  {sub}
+                                </Box>
+                              );
+                            })}
+                          </Box>
+                        </Box>
                       </Box>
-                    </Box>
+                    </Portal>
                   )}
                 </Box>
               </Box>
