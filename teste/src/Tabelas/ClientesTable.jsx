@@ -4,6 +4,7 @@ import debounce from "lodash.debounce";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import { FaUserCircle } from "react-icons/fa";
 import { BsClipboardFill } from "react-icons/bs";
+import { FaPhone } from "react-icons/fa6";
 
 import {
   BsChevronExpand,
@@ -38,7 +39,11 @@ const filtrosIniciais = {
   dataFinal: null,
 };
 
-export default function ClientesTable({ fetchDataRef }) {
+export default function ClientesTable({
+  fetchDataRef,
+  onClienteEditandoChange,
+}) {
+  const [clienteEditando, setClienteEditando] = useState(null);
   const [clientes, setClientes] = useState([]);
   const [enableResizing, setEnableResizing] = useState(false);
   const [columnSizes, setColumnSizes] = useState({});
@@ -87,6 +92,7 @@ export default function ClientesTable({ fetchDataRef }) {
 
   const [hiddenColumns, setHiddenColumns] = useState([
     "Email",
+    "Telefone",
     "Inscricao Estadual",
     "Data de Cadastro",
     "Endereco",
@@ -112,6 +118,7 @@ export default function ClientesTable({ fetchDataRef }) {
       if (width <= 1140) {
         newHiddenColumns = [
           "Email",
+          "Telefone",
           "Inscricao Estadual",
           "Data de Cadastro",
           "Endereco",
@@ -124,6 +131,7 @@ export default function ClientesTable({ fetchDataRef }) {
       } else if (width <= 1339) {
         newHiddenColumns = [
           "Email",
+          "Telefone",
           "Inscricao Estadual",
           "Data de Cadastro",
           "CPF/CNPJ",
@@ -137,6 +145,7 @@ export default function ClientesTable({ fetchDataRef }) {
       } else if (width <= 1639) {
         newHiddenColumns = [
           "Email",
+          "Telefone",
           "Inscricao Estadual",
           "Data de Cadastro",
           "Endereco",
@@ -148,6 +157,7 @@ export default function ClientesTable({ fetchDataRef }) {
         ];
       } else if (width <= 1920) {
         newHiddenColumns = [
+          "Telefone",
           "Inscricao Estadual",
           "Data de Cadastro",
           "Endereco",
@@ -159,6 +169,7 @@ export default function ClientesTable({ fetchDataRef }) {
         ];
       } else {
         newHiddenColumns = [
+          "Telefone",
           "Inscricao Estadual",
           "Data de Cadastro",
           "Endereco",
@@ -248,6 +259,7 @@ export default function ClientesTable({ fetchDataRef }) {
           }[cliente.tipo] || cliente.tipo,
         status: cliente.status,
         Email: cliente.email,
+        Telefone: cliente.telefone,
         "Inscricao Estadual": cliente.inscricaoEstadual,
         "Data de Cadastro": formatarData(cliente.dataCadastro),
         dataCadastroRaw: cliente.dataCadastro,
@@ -410,6 +422,7 @@ export default function ClientesTable({ fetchDataRef }) {
     "Tipo",
     "CPF/CNPJ",
     "Email",
+    "Telefone",
     "Inscricao Estadual",
     "Data de Cadastro",
     "Endereco",
@@ -502,6 +515,16 @@ export default function ClientesTable({ fetchDataRef }) {
         enableResizing: true,
         minSize: 200,
       },
+
+      // COLUNA TELEFONE
+      {
+        id: "Telefone",
+        accessorKey: "Telefone",
+        enableSorting: true,
+        enableResizing: true,
+        minSize: 200,
+      },
+
       // COLUNA STATUS
       {
         id: "status",
@@ -540,7 +563,10 @@ export default function ClientesTable({ fetchDataRef }) {
               <FiMail className="text-black" />
             </div>
 
-            <div className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg">
+            <div
+              className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg"
+              onClick={() => handleSetClienteEditando(row.original)}
+            >
               <FiEdit className="text-orange-500" />
             </div>
 
@@ -727,6 +753,11 @@ export default function ClientesTable({ fetchDataRef }) {
     </div>
   );
 
+  const handleSetClienteEditando = (cliente) => {
+    setClienteEditando(cliente);
+    if (onClienteEditandoChange) onClienteEditandoChange(cliente);
+  };
+
   return (
     <div>
       <CustomTable
@@ -758,8 +789,6 @@ export default function ClientesTable({ fetchDataRef }) {
         }}
         externalRowSelectionResetKey={selectionResetKey}
       />
-
-      <Toaster />
 
       {selectedRows.length > 0 && (
         <div className="fixed bottom-4 left-[50%] -translate-x-1/2 bg-white shadow-lg !border !border-gray-300 rounded-lg !px-6 !py-4 !z-50 !flex !items-center gap-4 animate-fade-in">
@@ -884,6 +913,13 @@ export default function ClientesTable({ fetchDataRef }) {
                         label="Email"
                         value={linhaSelecionada.Email}
                         icon={<FaEnvelope className="text-gray-500" />}
+                      />
+                    )}
+                    {linhaSelecionada.Telefone && (
+                      <Field
+                        label="Telefone"
+                        value={linhaSelecionada.Telefone}
+                        icon={<FaPhone className="text-gray-500" />}
                       />
                     )}
                     {linhaSelecionada["Inscricao Estadual"] && (

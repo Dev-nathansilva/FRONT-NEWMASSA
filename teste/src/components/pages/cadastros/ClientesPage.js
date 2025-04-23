@@ -1,3 +1,4 @@
+"use client";
 import ClientesTable from "@/Tabelas/ClientesTable";
 import {
   Box,
@@ -6,6 +7,8 @@ import {
   Portal,
   CloseButton,
   HStack,
+  Text,
+  Badge,
 } from "@chakra-ui/react";
 
 import { BsPrinterFill } from "react-icons/bs";
@@ -13,12 +16,13 @@ import { IoPeopleSharp } from "react-icons/io5";
 import { LuPlus } from "react-icons/lu";
 import { BsPersonFillAdd } from "react-icons/bs";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { FiRefreshCcw } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import ClienteModal from "@/components/modais/ClienteModal";
 import { toaster } from "@/components/ui/toaster";
+import { MdLabelOutline } from "react-icons/md";
 
 export default function ClientesPage() {
   const [tipo, setTipo] = useState("");
@@ -26,6 +30,7 @@ export default function ClientesPage() {
   const [isExporting, setIsExporting] = useState(false);
   const fetchDataRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [clienteEditando, setClienteEditando] = useState(null);
 
   const {
     register,
@@ -33,39 +38,56 @@ export default function ClientesPage() {
     setValue,
     control,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm();
 
   const onSubmit = async (data) => {
+    if (!data.credito || data.credito === "") {
+      data.credito = 0.0;
+    } else {
+      data.credito = parseFloat(data.credito);
+    }
+
     const payload = {
       ...data,
     };
+    const isEditing = !!clienteEditando;
 
     try {
-      const response = await fetch("http://localhost:5000/api/clientes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/clientes${
+          isEditing ? `/${clienteEditando.id}` : ""
+        }`,
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const result = await response.json();
 
       if (response.ok) {
-        resetForm();
         setTableKey((prev) => prev + 1); // atualiza a tabela
         setIsModalOpen(false);
+        resetForm();
+        setClienteEditando(null);
         toaster.create({
-          title: "Cliente Novo!",
-          description: "Cliente Criado com Sucesso",
+          title: isEditing ? "Cliente Atualizado!" : "Cliente Novo!",
+          description: isEditing
+            ? "Alterações salvas com sucesso"
+            : "Cliente criado com sucesso",
           type: "success",
           duration: 3000,
         });
       } else {
         toaster.create({
           title: "Erro!",
-          description: `Erro ao criar cliente: ${result.error}`,
+          description: `Erro ao ${isEditing ? "atualizar" : "criar"} cliente: ${
+            result.error
+          }`,
           type: "warning",
           duration: 3000,
         });
@@ -113,6 +135,37 @@ export default function ClientesPage() {
     setIsExporting(false);
   };
   const [tableKey, setTableKey] = useState(0);
+
+  const mapTipo = (tipo) => {
+    if (tipo === "Pessoa Física") return "PessoaFisica";
+    if (tipo === "Empresa") return "Empresa";
+    return "";
+  };
+
+  const preencherFormulario = (cliente) => {
+    setValue("nome", cliente.Nome || "");
+    const tipoFormatado = mapTipo(cliente.Tipo);
+    handleTipoChange({ target: { value: tipoFormatado } });
+    setValue("documento", cliente["CPF/CNPJ"] || "");
+    setValue("email", cliente.Email || "");
+    setValue("telefone", cliente.Telefone || "");
+    setValue("endereco", cliente.Endereço || "");
+    setValue("complemento", cliente.Complemento || "");
+    setValue("cidade", cliente.Cidade || "");
+    setValue("bairro", cliente.Bairro || "");
+    setValue("cep", cliente.CEP || "");
+    setValue("credito", cliente.Credito || "");
+    setValue("status", cliente.status || "Inativo");
+    setValue("inscricaoEstadual", cliente["Inscricao Estadual"]);
+  };
+
+  useEffect(() => {
+    if (clienteEditando) {
+      setIsModalOpen(true);
+      preencherFormulario(clienteEditando);
+      console.log(clienteEditando);
+    }
+  }, [clienteEditando]);
 
   return (
     <div>
@@ -235,20 +288,31 @@ export default function ClientesPage() {
                     justifyContent="space-between"
                     className="!border-b"
                   >
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      gap={3}
-                      className="bg-[#f1f1f1] !px-4 !py-2  rounded-[10px] !border !border-[#5e5e5e] shadow-md"
-                    >
-                      <BsPersonFillAdd size={25} />
-                      <Dialog.Title
-                        fontWeight="bold"
-                        fontSize="lg"
-                        className="!leading-0 "
+                    <Box className="flex items-center gap-4">
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        gap={3}
+                        className="bg-[#f1f1f1] !px-4 !py-2  rounded-[10px] !border !border-[#5e5e5e] shadow-md"
                       >
-                        Adicionar Novo Cliente
-                      </Dialog.Title>
+                        <BsPersonFillAdd size={25} />
+                        <Dialog.Title
+                          fontWeight="bold"
+                          fontSize="lg"
+                          className="!leading-0 "
+                        >
+                          {clienteEditando
+                            ? "Informações do Cliente"
+                            : "Adicionar Novo Cliente"}
+                        </Dialog.Title>
+                      </Box>
+                      {clienteEditando && (
+                        <Badge colorPalette="orange">
+                          {" "}
+                          <MdLabelOutline />
+                          Editando
+                        </Badge>
+                      )}
                     </Box>
                     <HStack>
                       <CloseButton
@@ -256,8 +320,9 @@ export default function ClientesPage() {
                         variant="subtle"
                         colorPalette="gray"
                         onClick={() => {
-                          resetForm();
                           setIsModalOpen(false); // FECHA O MODAL
+                          resetForm();
+                          setClienteEditando(null);
                         }}
                       />
                     </HStack>
@@ -284,8 +349,9 @@ export default function ClientesPage() {
                       rounded="5px"
                       variant="surface"
                       onClick={() => {
-                        resetForm();
                         setIsModalOpen(false); // FECHA O MODAL
+                        resetForm();
+                        setClienteEditando(null);
                       }}
                     >
                       Cancelar
@@ -293,12 +359,17 @@ export default function ClientesPage() {
                     <Button
                       type="submit"
                       onClick={handleSubmit(onSubmit)}
+                      disabled={clienteEditando && !isDirty}
                       form="formCliente"
                       className="!text-white"
                       rounded="5px"
                       colorPalette="green"
                     >
-                      Salvar
+                      {clienteEditando
+                        ? isDirty
+                          ? "Salvar Alterações"
+                          : "Salvar"
+                        : "Salvar"}
                     </Button>
                   </Dialog.Footer>
                 </Dialog.Content>
@@ -308,7 +379,11 @@ export default function ClientesPage() {
         </div>
       </div>
 
-      <ClientesTable key={tableKey} fetchDataRef={fetchDataRef} />
+      <ClientesTable
+        key={tableKey}
+        fetchDataRef={fetchDataRef}
+        onClienteEditandoChange={setClienteEditando}
+      />
     </div>
   );
 }

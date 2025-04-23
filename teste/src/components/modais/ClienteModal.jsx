@@ -17,6 +17,7 @@ import { withMask } from "use-mask-input";
 import { HiCheck, HiX } from "react-icons/hi";
 import { NumericFormat } from "react-number-format";
 import { useEffect } from "react";
+import { useWatch } from "react-hook-form";
 
 export default function ClienteModal({
   register,
@@ -29,13 +30,18 @@ export default function ClienteModal({
 }) {
   const [checked, setChecked] = useState(true);
 
-  useEffect(() => {
-    setValue("credito", 0);
-  }, [setValue]);
+  const status = useWatch({ control, name: "status" });
 
+  // Atualiza o valor de `checked` só uma vez quando o status for carregado (ex: ao editar)
   useEffect(() => {
-    setValue("status", checked === true ? "Ativo" : "Inativo");
-  }, [checked]);
+    if (status === "Ativo") setChecked(true);
+    else if (status === "Inativo") setChecked(false);
+  }, []); // ← executa só uma vez
+
+  // Atualiza o valor do form quando o usuário mexe no switch
+  useEffect(() => {
+    setValue("status", checked ? "Ativo" : "Inativo");
+  }, [checked, setValue]);
 
   return (
     <form id="formCliente">
@@ -199,7 +205,10 @@ export default function ClienteModal({
                   }
                 />
               </Field.Label>
-              <Input placeholder="00000000-0" />
+              <Input
+                placeholder="00000000-0"
+                {...register("inscricaoEstadual")}
+              />
             </Field.Root>
 
             <Field.Root
@@ -316,18 +325,26 @@ export default function ClienteModal({
             <Field.Root>
               <Field.Label>Crédito</Field.Label>
               <InputGroup startAddon="R$" endAddon="BRL">
-                <NumericFormat
-                  customInput={Input}
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  decimalScale={2}
-                  fixedDecimalScale
-                  allowNegative={false}
-                  placeholder="0,00"
-                  {...register("credito")}
-                  onValueChange={(values) =>
-                    setValue("credito", values.floatValue || 0)
-                  }
+                <Controller
+                  name="credito"
+                  control={control}
+                  defaultValue={""}
+                  render={({ field }) => (
+                    <NumericFormat
+                      {...field}
+                      customInput={Input}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                      decimalScale={2}
+                      fixedDecimalScale
+                      allowNegative={false}
+                      placeholder="0,00"
+                      value={field.value ?? 0}
+                      onValueChange={(values) => {
+                        field.onChange(values.floatValue ?? 0);
+                      }}
+                    />
+                  )}
                 />
               </InputGroup>
             </Field.Root>
