@@ -15,6 +15,8 @@ import { PiSidebarLight } from "react-icons/pi";
 import { RxGear } from "react-icons/rx";
 import { InputGroup } from "../ui/input-group";
 import { LuSearch } from "react-icons/lu";
+import { MdBackup } from "react-icons/md";
+import { toaster } from "../ui/toaster";
 
 export default function Topbar({
   user,
@@ -24,6 +26,25 @@ export default function Topbar({
   subTitle,
 }) {
   const profileImage = user?.foto || "../images-perfil/foto-perfil-anonima.png";
+
+  const handleBackup = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/backup");
+      if (!response.ok) throw new Error("Erro ao fazer o backup");
+
+      toaster.create({
+        description: "Backup Feito com Sucesso!!",
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      toaster.create({
+        description: "Erro ao fazer o backup!",
+        type: "error",
+        duration: 3000,
+      });
+    }
+  };
 
   return (
     <Flex
@@ -52,6 +73,10 @@ export default function Topbar({
 
       <Box className="flex items-center">
         <Box className="group-actions">
+          <Box className="icon-action-topbar" onClick={handleBackup}>
+            <MdBackup color="black" />
+          </Box>
+
           <Box className="icon-action-topbar">
             <LuSearch color="black" />
           </Box>

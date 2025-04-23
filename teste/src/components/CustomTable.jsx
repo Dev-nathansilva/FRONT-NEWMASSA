@@ -429,7 +429,7 @@ export default function CustomTable({
                       colSpan={columns.length}
                       className=" !border-[#e7e7e7] !rounded-[10px] !p-4 !text-gray-500 !text-center"
                     >
-                      <FiAlertOctagon className="inline-block !mr-2 !mt-[-2px]" />{" "}
+                      <FiAlertOctagon className="!inline-block !mr-2 !mt-[-2px]" />{" "}
                       Nenhum item encontrado
                     </td>
                   </tr>

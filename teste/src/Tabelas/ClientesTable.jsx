@@ -340,7 +340,7 @@ export default function ClientesTable({
       <div className="relative gap-3 flex items-center">
         <span>Data de Cadastro</span>
         <div
-          className={`cursor-pointer filter-icon p-1 rounded-[4px] ${
+          className={`cursor-pointer filter-icon !p-1 !rounded-[4px] ${
             isActive ? "bg-blue-200" : "bg-gray-100 hover:bg-gray-300"
           }`}
           onClick={() => togglePopup("dataCadastro")}
@@ -355,17 +355,17 @@ export default function ClientesTable({
         {popupStates["dataCadastro"] && (
           <div
             ref={popupRefs["dataCadastro"]}
-            className="absolute top-9 w-72 bg-white border border-gray-200 rounded-md shadow-lg z-10 p-4"
+            className="absolute top-9 w-72 bg-white !border !border-gray-200 !rounded-md !shadow-lg z-10 !p-4"
           >
-            <h2 className="text-sm font-semibold mb-2">
+            <h2 className="!text-sm !font-semibold !mb-2">
               Filtrar por intervalo
             </h2>
-            <div className="flex flex-col gap-2 text-sm">
+            <div className="!flex !flex-col !gap-2 !text-sm">
               <label>
                 Data Inicial:
                 <input
                   type="date"
-                  className=" border px-2 py-1 rounded mt-1"
+                  className=" !border !px-2 !py-1 !rounded !mt-1"
                   value={filters.dataInicial || ""}
                   onChange={(e) =>
                     setFilters((prev) => ({
@@ -379,7 +379,7 @@ export default function ClientesTable({
                 Data Final:
                 <input
                   type="date"
-                  className=" border px-2 py-1 rounded mt-1"
+                  className=" !border !px-2 !py-1 !rounded !mt-1"
                   value={filters.dataFinal || ""}
                   onChange={(e) =>
                     setFilters((prev) => ({
