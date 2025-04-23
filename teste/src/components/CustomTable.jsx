@@ -220,7 +220,7 @@ export default function CustomTable({
           >
             <Input
               type="text"
-              className="!border-none input-pesquisa focus-visible:!outline-gray-400 !text-gray-400"
+              className="!border-none input-pesquisa focus-visible:!outline-gray-400 !text-gray-700"
               placeholder="Pesquisar..."
               value={search}
               onChange={(e) => {
@@ -236,7 +236,7 @@ export default function CustomTable({
 
         <div className="relative">
           <Button
-            className="!px-3 !py-2 !bg-gray-300 hover:!bg-gray-400 cursor-pointer text-black !rounded-[10px] text-[20px] !border !border-gray-300"
+            className="!px-3 !py-2 !bg-gray-200 hover:!bg-gray-300 cursor-pointer text-black !rounded-[10px] text-[20px] !border !border-gray-300"
             onClick={() => togglePopup("func")}
           >
             <LuSettings2 />
@@ -289,7 +289,7 @@ export default function CustomTable({
                   {popupStates.columns && (
                     <div
                       ref={popupRefs.columns}
-                      className="absolute z-[1000] !mr-[-33px] right-0 top-0 !w-64 bg-white !border !border-gray-300 shadow-lg !rounded-md !p-4 !overflow-y-auto !max-h-[200px]"
+                      className="absolute z-[1000] !mr-[-20px] right-0 top-0 !w-64 bg-white !border !border-gray-300 shadow-lg !rounded-md !p-4 !overflow-y-auto !max-h-[200px]"
                     >
                       {/* Checkbox para selecionar/desmarcar todas as colunas */}
                       <label className="block font-medium !mb-2">

@@ -157,9 +157,9 @@ export default function ClientesPage() {
     setValue("cidade", cliente.Cidade || "");
     setValue("bairro", cliente.Bairro || "");
     setValue("cep", cliente.CEP || "");
-    setValue("credito", cliente.Credito || "");
+    setValue("credito", cliente["Crédito"] || "");
     setValue("status", cliente.status || "Inativo");
-    setValue("inscricaoEstadual", cliente["Inscricao Estadual"]);
+    setValue("inscricaoEstadual", cliente["Inscrição Estadual"]);
     setValue("observacoes", cliente["Observações"] || "");
   };
 

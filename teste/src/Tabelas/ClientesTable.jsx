@@ -56,6 +56,7 @@ export default function ClientesTable({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const abrirDrawerComDados = (linha) => {
+    console.log(linha);
     setLinhaSelecionada(linha);
     setIsDrawerOpen(true);
   };
@@ -973,7 +974,7 @@ export default function ClientesTable({
                 {/* Seção 2 - Endereços */}
                 <div>
                   <h3 className="!bg-gray-100 !text-center !py-2 rounded-[10px] !text-sm !font-bold !text-gray-600 !mb-4">
-                    Endereços
+                    Endereço
                   </h3>
                   <div className="!space-y-4">
                     <Field
