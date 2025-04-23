@@ -559,7 +559,19 @@ export default function ClientesTable({
               <FiEye className=" text-black" title="Visualizar" />
             </div>
 
-            <div className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg">
+            <div
+              className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg"
+              onClick={() => {
+                const email = row.original.Email;
+                if (email) {
+                  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
+                  window.open(gmailUrl, "_blank");
+                } else {
+                  alert("Email não disponível");
+                }
+              }}
+              title={`Enviar email para ${row.original.Email}`}
+            >
               <FiMail className="text-black" />
             </div>
 
@@ -971,14 +983,28 @@ export default function ClientesTable({
               </Drawer.Body>
 
               <Drawer.Footer className="!w-full !px-6 !py-4 !border-t flex flex-col gap-3 bg-white">
-                <button className="!w-full flex items-center justify-center gap-2 !bg-blue-600 hover:!bg-blue-700 !text-white !font-semibold !py-3 !rounded-lg transition">
+                <button
+                  onClick={() => {
+                    setIsDrawerOpen(false); // fecha o drawer
+                    onClienteEditandoChange(linhaSelecionada); // abre o modal no ClientesPage
+                  }}
+                  className="!w-full flex items-center justify-center gap-2 !bg-blue-600 hover:!bg-blue-700 !text-white !font-semibold !py-3 !rounded-lg transition"
+                >
                   <FaEdit className="!text-[20px]" />
                   Editar Informações
                 </button>
-                <button className="!w-full flex items-center justify-center gap-2 !bg-green-500 hover:!bg-green-600 !text-white !font-semibold !py-3 !rounded-lg transition">
+                <a
+                  href={`https://wa.me/send?phone=55${linhaSelecionada.Telefone.replace(
+                    /\D/g,
+                    ""
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="!no-underline !w-full flex items-center justify-center gap-2 !bg-green-500 hover:!bg-green-600 !text-white !font-semibold !py-3 !rounded-lg transition"
+                >
                   <FaWhatsapp className="!text-[20px]" />
                   Enviar Mensagem
-                </button>
+                </a>
               </Drawer.Footer>
             </Drawer.Content>
           </Drawer.Positioner>

@@ -108,8 +108,9 @@ export default function ClientesPage() {
       setValue("tipo", "");
       setValue("documento", "");
       documentoRef.current = null;
+      handleTipoChange({ target: { value: "" } });
       reset();
-    }, 1000);
+    }, 500);
   };
 
   // Atualiza a máscara do documento quando tipoPessoa muda
