@@ -82,7 +82,6 @@ export default function ClientesTable({
         label: "Tipo",
         options: [
           { value: "PessoaFisica", label: "Pessoa Física" },
-          { value: "PessoaJuridica", label: "Pessoa Jurídica" },
           { value: "Empresa", label: "Empresa" },
         ],
       },
@@ -93,13 +92,13 @@ export default function ClientesTable({
   const [hiddenColumns, setHiddenColumns] = useState([
     "Email",
     "Telefone",
-    "Inscricao Estadual",
+    "Inscrição Estadual",
     "Data de Cadastro",
-    "Endereco",
+    "Endereço",
     "Complemento",
     "Bairro",
     "CEP",
-    "Credito",
+    "Crédito",
     "Cidade",
     "Observações",
   ]);
@@ -120,13 +119,13 @@ export default function ClientesTable({
         newHiddenColumns = [
           "Email",
           "Telefone",
-          "Inscricao Estadual",
+          "Inscrição Estadual",
           "Data de Cadastro",
-          "Endereco",
+          "Endereço",
           "Complemento",
           "Bairro",
           "CEP",
-          "Credito",
+          "Crédito",
           "Cidade",
           "Observações",
         ];
@@ -134,14 +133,14 @@ export default function ClientesTable({
         newHiddenColumns = [
           "Email",
           "Telefone",
-          "Inscricao Estadual",
+          "Inscrição Estadual",
           "Data de Cadastro",
           "CPF/CNPJ",
-          "Endereco",
+          "Endereço",
           "Complemento",
           "Bairro",
           "CEP",
-          "Credito",
+          "Crédito",
           "Cidade",
           "Observações",
         ];
@@ -149,39 +148,39 @@ export default function ClientesTable({
         newHiddenColumns = [
           "Email",
           "Telefone",
-          "Inscricao Estadual",
+          "Inscrição Estadual",
           "Data de Cadastro",
-          "Endereco",
+          "Endereço",
           "Complemento",
           "Bairro",
           "CEP",
-          "Credito",
+          "Crédito",
           "Cidade",
           "Observações",
         ];
       } else if (width <= 1920) {
         newHiddenColumns = [
           "Telefone",
-          "Inscricao Estadual",
+          "Inscrição Estadual",
           "Data de Cadastro",
-          "Endereco",
+          "Endereço",
           "Complemento",
           "Bairro",
           "CEP",
-          "Credito",
+          "Crédito",
           "Cidade",
           "Observações",
         ];
       } else {
         newHiddenColumns = [
           "Telefone",
-          "Inscricao Estadual",
+          "Inscrição Estadual",
           "Data de Cadastro",
-          "Endereco",
+          "Endereço",
           "Complemento",
           "Bairro",
           "CEP",
-          "Credito",
+          "Crédito",
           "Cidade",
           "Observações",
         ];
@@ -260,16 +259,15 @@ export default function ClientesTable({
         Tipo:
           {
             PessoaFisica: "Pessoa Física",
-            PessoaJuridica: "Pessoa Jurídica",
             Empresa: "Empresa",
           }[cliente.tipo] || cliente.tipo,
-        status: cliente.status,
+        Status: cliente.status,
         Email: cliente.email,
         Telefone: cliente.telefone,
         "Inscrição Estadual": cliente.inscricaoEstadual,
         "Data de Cadastro": formatarData(cliente.dataCadastro),
         dataCadastroRaw: cliente.dataCadastro,
-        Endereço: cliente.endereco,
+        ["Endereço"]: cliente.endereco,
         Complemento: cliente.complemento,
         Bairro: cliente.bairro,
         CEP: cliente.cep,
@@ -430,17 +428,17 @@ export default function ClientesTable({
     "CPF/CNPJ",
     "Email",
     "Telefone",
-    "Inscricao Estadual",
+    "Inscrição Estadual",
     "Data de Cadastro",
-    "Endereco",
+    "Endereço",
     "Complemento",
     "Bairro",
     "Cidade",
     "CEP",
-    "Credito",
+    "Crédito",
     "Observações",
-    "status",
-    "ações",
+    "Status",
+    "Ações",
   ]);
 
   // Componente reutilizável para cabeçalhos ordenáveis
@@ -543,8 +541,8 @@ export default function ClientesTable({
 
       // COLUNA STATUS
       {
-        id: "status",
-        accessorKey: "status",
+        id: "Status",
+        accessorKey: "Status",
         header: () => renderFilterHeader("status"),
         enableSorting: true,
         enableResizing: true,
@@ -563,7 +561,7 @@ export default function ClientesTable({
       },
       // COLUNA AÇÕES
       {
-        id: "ações",
+        id: "Ações",
         accessorKey: "Ações",
         header: "Ações",
         cell: ({ row }) => (
@@ -621,7 +619,7 @@ export default function ClientesTable({
       },
       // COLUNA INSCRIÇÃO ESTADUAL
       {
-        id: "Inscricao Estadual",
+        id: "Inscrição Estadual",
         header: "Inscrição Estadual",
         accessorKey: "Inscrição Estadual",
         enableHiding: true,
@@ -638,7 +636,7 @@ export default function ClientesTable({
       },
       // COLUNA ENDEREÇO
       {
-        id: "Endereco",
+        id: "Endereço",
         accessorKey: "Endereço",
         enableHiding: true,
         size: 250,
@@ -678,7 +676,7 @@ export default function ClientesTable({
       },
       // COLUNA CREDITO
       {
-        id: "Credito",
+        id: "Crédito",
         accessorKey: "Crédito",
         enableHiding: true,
         minSize: 150,
@@ -928,12 +926,12 @@ export default function ClientesTable({
                       value={
                         <span
                           className={`!inline-block !px-2 !py-0.5 !rounded-full !text-xs !font-medium ${
-                            linhaSelecionada.status === "Ativo"
+                            linhaSelecionada.Status === "Ativo"
                               ? "bg-green-100 text-green-700"
                               : "bg-red-100 text-red-700"
                           }`}
                         >
-                          {linhaSelecionada.status}
+                          {linhaSelecionada.Status}
                         </span>
                       }
                     />
@@ -956,7 +954,7 @@ export default function ClientesTable({
                       label="Inscrição Estadual"
                       icon={<GoOrganization />}
                       value={
-                        linhaSelecionada["Inscricao Estadual"]
+                        linhaSelecionada["Inscrição Estadual"]
                           ?.toString()
                           .trim() || "-"
                       }

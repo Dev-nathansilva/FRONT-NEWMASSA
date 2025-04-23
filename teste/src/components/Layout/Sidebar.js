@@ -143,12 +143,12 @@ export default function Sidebar({
                       <Box
                         position="fixed"
                         top={submenuPosition.top}
-                        left={submenuPosition.left}
+                        left={submenuPosition.left - 2}
                         zIndex={1000}
                         onMouseEnter={() => setHoveredMenu(item.name)}
-                        onMouseLeave={() => setHoveredMenu(null)}
+                        onMouseLeave={() => setHoveredMenu(item.name)}
                       >
-                        <Box pl="2">
+                        <Box pl="3">
                           {" "}
                           {/* Box extra invisível para garantir espaço no hover */}
                           <Box
