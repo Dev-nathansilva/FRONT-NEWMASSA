@@ -165,7 +165,9 @@ export default function Sidebar({
                               alignItems="center"
                               p={2}
                             >
-                              <Box mr={2}>{item.icon}</Box>
+                              <Box mr={2} ml={2}>
+                                {item.icon}
+                              </Box>
                               <Text>{item.name}</Text>
                             </Box>
 

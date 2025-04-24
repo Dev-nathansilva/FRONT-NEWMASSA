@@ -122,11 +122,21 @@ export default function ClientesPage() {
   };
 
   const fetchData = async () => {
-    const response = await fetch(
-      "http://localhost:5000/api/clientes?limit=1000"
-    );
-    const json = await response.json();
-    return json.data;
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/clientes?limit=1000"
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erro na requisição: ${response.status}`);
+      }
+
+      const json = await response.json();
+      return json.data;
+    } catch (error) {
+      console.error("Erro ao buscar dados:", error.message);
+      return [];
+    }
   };
   const exportToExcel = async () => {
     setIsExporting(true);

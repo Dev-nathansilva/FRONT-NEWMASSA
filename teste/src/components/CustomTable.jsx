@@ -13,6 +13,7 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { FaTableList } from "react-icons/fa6";
+import { Switch } from "@chakra-ui/react";
 
 import {
   MdKeyboardArrowLeft,
@@ -21,12 +22,15 @@ import {
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
-import { IoBrowsersOutline } from "react-icons/io5";
+import { IoBrowsersOutline, IoTabletLandscape } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import usePopupManager from "../hooks/popupmanager";
 import { LuSettings2 } from "react-icons/lu";
-import { Button, Input, InputGroup } from "@chakra-ui/react";
+import { Button, CloseButton, Input, InputGroup } from "@chakra-ui/react";
 import { TbListDetails } from "react-icons/tb";
+import { BsWrenchAdjustable } from "react-icons/bs";
+import { GoGear } from "react-icons/go";
+import { FaColumns } from "react-icons/fa";
 
 export default function CustomTable({
   data,
@@ -234,6 +238,59 @@ export default function CustomTable({
           Filtros
         </button> */}
 
+        {/* OCULTAR / EXIBIR */}
+        <div className="relative inline-block">
+          <Button
+            colorPalette="gray"
+            variant="subtle"
+            onClick={() => togglePopup("columns")}
+            className="!px-3 !py-2 !bg-gray-200 hover:!bg-gray-300 cursor-pointer text-black !rounded-[10px] text-[20px] !border !border-gray-300"
+          >
+            <FaColumns />
+          </Button>
+
+          {popupStates.columns && (
+            <div
+              ref={popupRefs.columns}
+              className="absolute flex flex-col justify-start items-start z-[1000] !ml-[-70px] left-0 top-13 !w-64 bg-white !border !border-gray-300 shadow-lg !rounded-md !p-4 !overflow-y-auto !max-h-[250px]"
+            >
+              {/* Checkbox para selecionar/desmarcar todas as colunas */}
+              <span className="bg-gray-200 !p-3 !w-full !rounded-[10px] !font-semibold text-center !mb-3">
+                Ocultar/Exibir Colunas
+              </span>
+              <label className="block font-medium !mb-2">
+                <input
+                  type="checkbox"
+                  checked={Object.values(visibleColumns).every(Boolean)}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    const updatedColumns = {};
+                    columns.forEach((col) => {
+                      updatedColumns[col.id] = isChecked;
+                    });
+                    setVisibleColumns(updatedColumns);
+                  }}
+                  className="!mr-2"
+                />
+                Selecionar/Desmarcar Tudo
+              </label>
+
+              {/* Checkboxes individuais para cada coluna */}
+              {columns.map((col) => (
+                <label key={col.id} className="block">
+                  <input
+                    type="checkbox"
+                    checked={visibleColumns[col.id]}
+                    onChange={() => toggleColumnVisibility(col.id)}
+                    className="!mr-2"
+                  />
+                  {col.id}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="relative">
           <Button
             className="!px-3 !py-2 !bg-gray-200 hover:!bg-gray-300 cursor-pointer text-black !rounded-[10px] text-[20px] !border !border-gray-300"
@@ -244,85 +301,43 @@ export default function CustomTable({
           {popupStates.func && (
             <div
               ref={popupRefs.func}
-              className="absolute z-[1000] !mt-2 w-[500px] bg-white !border !border-gray-300 shadow-xl rounded-lg !p-6"
+              className="absolute z-[1000] !mt-2 w-[400px] bg-white !border !border-gray-300 shadow-xl rounded-lg !p-6"
             >
               <div className="flex justify-between items-center !mb-4">
-                <h2 className="!text-lg font-semibold">Funcionalidades</h2>
-                <button onClick={() => closePopup("func")}>✖</button>
+                <h2 className="!text-lg font-semibold flex items-center gap-2">
+                  <GoGear className="!inline-block" />
+                  Funcionalidades
+                </h2>
+                <CloseButton
+                  className="!absolute !top-3 !right-4 !rounded-[10px]"
+                  onClick={() => closePopup("func")}
+                >
+                  ✖
+                </CloseButton>
               </div>
 
               {/* Conteúdo de funcionalidades aqui */}
               <div className="flex flex-col gap-4">
                 {/* Redimensionamento */}
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center justify-between bg-gray-100 !py-2 !px-4 !rounded-[10px] !border ">
+                  <span className="text-gray-500">Redimensionamento</span>
                   <input
                     className="switch"
                     type="checkbox"
                     checked={enableResizing}
                     onChange={() => setEnableResizing((prev) => !prev)}
                   />
-                  <span>Redimensionamento</span>
                 </div>
 
                 {/* Reordenação */}
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center justify-between bg-gray-100 !py-2 !px-4 !rounded-[10px] !border ">
+                  <span className="text-gray-500">Reordenação de Colunas</span>
                   <input
                     className="switch"
                     type="checkbox"
                     checked={enableDragging}
                     onChange={() => setEnableDragging((prev) => !prev)}
                   />
-                  <span>Ativar Reordenação de Colunas</span>
-                </div>
-
-                {/* OCULTAR / EXIBIR */}
-                <div className="relative inline-block">
-                  <Button
-                    colorPalette="gray"
-                    variant="subtle"
-                    onClick={() => togglePopup("columns")}
-                    className="flex items-center gap-3 !px-4 !py-2 !rounded-md"
-                  >
-                    Ocultar/Exibir Colunas <IoIosArrowForward />
-                  </Button>
-
-                  {popupStates.columns && (
-                    <div
-                      ref={popupRefs.columns}
-                      className="absolute z-[1000] !mr-[-20px] right-0 top-0 !w-64 bg-white !border !border-gray-300 shadow-lg !rounded-md !p-4 !overflow-y-auto !max-h-[200px]"
-                    >
-                      {/* Checkbox para selecionar/desmarcar todas as colunas */}
-                      <label className="block font-medium !mb-2">
-                        <input
-                          type="checkbox"
-                          checked={Object.values(visibleColumns).every(Boolean)}
-                          onChange={(e) => {
-                            const isChecked = e.target.checked;
-                            const updatedColumns = {};
-                            columns.forEach((col) => {
-                              updatedColumns[col.id] = isChecked;
-                            });
-                            setVisibleColumns(updatedColumns);
-                          }}
-                          className="!mr-2"
-                        />
-                        Selecionar/Desmarcar Tudo
-                      </label>
-
-                      {/* Checkboxes individuais para cada coluna */}
-                      {columns.map((col) => (
-                        <label key={col.id} className="block">
-                          <input
-                            type="checkbox"
-                            checked={visibleColumns[col.id]}
-                            onChange={() => toggleColumnVisibility(col.id)}
-                            className="!mr-2"
-                          />
-                          {col.id}
-                        </label>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
