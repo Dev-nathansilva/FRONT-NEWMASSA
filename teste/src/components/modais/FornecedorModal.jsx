@@ -7,7 +7,6 @@ import {
   Field,
   Input,
   InputGroup,
-  NativeSelect,
   Switch,
   Badge,
   Span,
@@ -17,18 +16,16 @@ import { withMask } from "use-mask-input";
 import { HiCheck, HiX } from "react-icons/hi";
 import { NumericFormat } from "react-number-format";
 
-export default function ClienteModal({
+export default function FornecedorModal({
   register,
   control,
-  handleTipoChange,
   errors,
-  tipo,
   documentoRef,
   setValue,
-  clienteEditando,
+  fornecedorEditando,
 }) {
   return (
-    <form id="formCliente">
+    <form id="formFornecedor">
       <Stack spacing={6} className="!flex !flex-col !gap-10">
         {/* DADOS CADASTRAIS */}
         <Box>
@@ -53,8 +50,8 @@ export default function ClienteModal({
                 rules={{
                   required: "Nome é obrigatório",
                   maxLength: {
-                    value: 100,
-                    message: "Limite máximo de 100 caracteres",
+                    value: 50,
+                    message: "Limite máximo de 50 caracteres",
                   },
                 }}
                 render={({ field }) => {
@@ -63,9 +60,8 @@ export default function ClienteModal({
                     <InputGroup
                       endElement={
                         <Span
-                          color={length > 50 ? "danger" : "fg.muted"}
+                          color={length > 50 ? "red" : "fg.muted"}
                           textStyle="xs"
-                          className="!bg-white !pl-2 !py-1"
                         >
                           {length} / 50
                         </Span>
@@ -73,8 +69,10 @@ export default function ClienteModal({
                     >
                       <Input
                         {...field}
-                        maxLength={50} // opcional: permite digitar até 120, mas valida só até 100
+                        maxLength={50}
+                        value={field.value || ""}
                         placeholder="Nome completo ou razão social"
+                        className="!pr-14"
                       />
                     </InputGroup>
                   );
@@ -84,37 +82,9 @@ export default function ClienteModal({
               <Field.ErrorText>{errors.nome?.message}</Field.ErrorText>
             </Field.Root>
 
-            <Controller
-              name="tipo"
-              control={control}
-              rules={{ required: "Selecione um item da lista" }}
-              render={({ field }) => (
-                <Field.Root required invalid={!!errors.tipo}>
-                  <Field.Label>
-                    Tipo de Pessoa <Field.RequiredIndicator />
-                  </Field.Label>
-                  <NativeSelect.Root>
-                    <NativeSelect.Field
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleTipoChange(e); // ainda atualiza o state e reseta o documento
-                      }}
-                    >
-                      <option value="">Selecione um tipo</option>
-                      <option value="PessoaFisica">Pessoa Física</option>
-                      <option value="Empresa">Empresa</option>
-                    </NativeSelect.Field>
-                    <NativeSelect.Indicator />
-                  </NativeSelect.Root>
-                  <Field.ErrorText>{errors.tipo?.message}</Field.ErrorText>
-                </Field.Root>
-              )}
-            />
-
             <Field.Root required invalid={!!errors.documento}>
               <Field.Label>
-                Documento (CPF/CNPJ) <Field.RequiredIndicator />
+                Documento (CNPJ) <Field.RequiredIndicator />
               </Field.Label>
               <Controller
                 name="documento"
@@ -124,11 +94,7 @@ export default function ClienteModal({
                   validate: (value) => {
                     const onlyNumbers = value.replace(/\D/g, "");
 
-                    if (tipo === "PessoaFisica" && onlyNumbers.length !== 11) {
-                      return "CPF inválido";
-                    }
-
-                    if (tipo === "Empresa" && onlyNumbers.length !== 14) {
+                    if (onlyNumbers.length !== 14) {
                       return "CNPJ inválido";
                     }
 
@@ -139,17 +105,12 @@ export default function ClienteModal({
                   <Input
                     {...field}
                     value={field.value || ""}
-                    disabled={!tipo}
-                    placeholder="Digite o CPF ou CNPJ"
+                    placeholder="Digite o CNPJ"
                     ref={(el) => {
                       field.ref(el);
                       documentoRef.current = el;
                       if (el) {
-                        if (tipo === "PessoaFisica") {
-                          withMask("999.999.999-99")(el);
-                        } else if (tipo === "Empresa") {
-                          withMask("99.999.999/9999-99")(el);
-                        }
+                        withMask("99.999.999/9999-99")(el);
                       }
                     }}
                   />
@@ -324,6 +285,109 @@ export default function ClienteModal({
           </SimpleGrid>
         </Box>
 
+        {/* FINANCEIRO */}
+        <Box>
+          <Heading
+            fontSize="md"
+            mb={4}
+            className="w-full !bg-gray-100 rounded-[5px] !pl-3"
+          >
+            Financeiro
+          </Heading>
+          <SimpleGrid
+            columns={{ base: 1, md: 2 }}
+            className="gap-x-10 gap-y-3 !px-3"
+          >
+            <Field.Root>
+              <Field.Label>Titular da Conta</Field.Label>
+              <Input
+                placeholder="Titular da conta"
+                {...register("nomeTitular")}
+              />
+            </Field.Root>
+
+            <Field.Root>
+              <Field.Label>Chave Pix</Field.Label>
+              <Input placeholder="Chave Pix" {...register("chavePix")} />
+            </Field.Root>
+
+            <Field.Root>
+              <Field.Label>Referência Bancária</Field.Label>
+              <Input
+                placeholder="Referência Bancária"
+                {...register("referenciaBancaria")}
+              />
+            </Field.Root>
+
+            <Field.Root invalid={!!errors.condicoesPagamento}>
+              <Field.Label>Condições de Pagamento</Field.Label>
+              <Controller
+                name="condicoesPagamento"
+                control={control}
+                rules={{
+                  maxLength: {
+                    value: 200,
+                    message: "Limite máximo de 200 caracteres",
+                  },
+                }}
+                render={({ field }) => {
+                  const length = (field.value || "").length;
+                  return (
+                    <InputGroup
+                      endElement={
+                        <Span
+                          color={length > 200 ? "red" : "fg.muted"}
+                          textStyle="xs"
+                        >
+                          {length} / 200
+                        </Span>
+                      }
+                    >
+                      <Input
+                        {...field}
+                        maxLength={200} // impede digitar mais que 200
+                        value={field.value ?? ""}
+                        placeholder="Condições de Pagamento..."
+                        className="!pr-17"
+                      />
+                    </InputGroup>
+                  );
+                }}
+              />
+              <Field.ErrorText>
+                {errors.condicoesPagamento?.message}
+              </Field.ErrorText>
+            </Field.Root>
+
+            <Field.Root>
+              <Field.Label>Crédito</Field.Label>
+              <InputGroup startAddon="R$" endAddon="BRL">
+                <Controller
+                  name="limiteCredito"
+                  control={control}
+                  defaultValue={""}
+                  render={({ field }) => (
+                    <NumericFormat
+                      {...field}
+                      customInput={Input}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                      decimalScale={2}
+                      fixedDecimalScale
+                      allowNegative={false}
+                      placeholder="0,00"
+                      value={field.value ?? 0}
+                      onValueChange={(values) => {
+                        field.onChange(values.floatValue ?? 0);
+                      }}
+                    />
+                  )}
+                />
+              </InputGroup>
+            </Field.Root>
+          </SimpleGrid>
+        </Box>
+
         {/* INFORMAÇÕES ADICIONAIS */}
         <Box>
           <Heading
@@ -354,9 +418,8 @@ export default function ClienteModal({
                     <InputGroup
                       endElement={
                         <Span
-                          color={length > 200 ? "danger" : "fg.muted"}
+                          color={length > 200 ? "red" : "fg.muted"}
                           textStyle="xs"
-                          className="!bg-white !pl-2 !py-1"
                         >
                           {length} / 200
                         </Span>
@@ -365,40 +428,15 @@ export default function ClienteModal({
                       <Input
                         {...field}
                         maxLength={200} // impede digitar mais que 200
+                        value={field.value || ""}
                         placeholder="Observações..."
+                        className="!pr-17"
                       />
                     </InputGroup>
                   );
                 }}
               />
               <Field.ErrorText>{errors.observacoes?.message}</Field.ErrorText>
-            </Field.Root>
-
-            <Field.Root>
-              <Field.Label>Crédito</Field.Label>
-              <InputGroup startAddon="R$" endAddon="BRL">
-                <Controller
-                  name="credito"
-                  control={control}
-                  defaultValue={""}
-                  render={({ field }) => (
-                    <NumericFormat
-                      {...field}
-                      customInput={Input}
-                      thousandSeparator="."
-                      decimalSeparator=","
-                      decimalScale={2}
-                      fixedDecimalScale
-                      allowNegative={false}
-                      placeholder="0,00"
-                      value={field.value ?? 0}
-                      onValueChange={(values) => {
-                        field.onChange(values.floatValue ?? 0);
-                      }}
-                    />
-                  )}
-                />
-              </InputGroup>
             </Field.Root>
           </SimpleGrid>
         </Box>

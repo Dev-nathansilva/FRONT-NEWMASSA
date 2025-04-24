@@ -168,7 +168,7 @@ export default function ClientesPage() {
     setValue("bairro", cliente.Bairro || "");
     setValue("cep", cliente.CEP || "");
     setValue("credito", cliente["Crédito"] || "");
-    setValue("status", cliente.status || "Inativo");
+    setValue("status", cliente.Status || "Inativo");
     setValue("inscricaoEstadual", cliente["Inscrição Estadual"]);
     setValue("observacoes", cliente["Observações"] || "");
   };
@@ -177,7 +177,7 @@ export default function ClientesPage() {
     if (clienteEditando) {
       setIsModalOpen(true);
       preencherFormulario(clienteEditando);
-      // console.log(clienteEditando);
+      console.log(clienteEditando);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clienteEditando]);

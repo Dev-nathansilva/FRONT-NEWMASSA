@@ -48,7 +48,7 @@ const SavedAccounts = ({
       ))}
 
       <Button
-        className="!mt-4  !font-normal !text-[16px] w-full botao-teste text-white rounded-lg transition"
+        className="!mt-4  !font-normal !text-[16px] w-full botao-teste !text-white !rounded-lg transition"
         onClick={() => setShowLoginForm(true)}
       >
         Fazer login com outra conta
