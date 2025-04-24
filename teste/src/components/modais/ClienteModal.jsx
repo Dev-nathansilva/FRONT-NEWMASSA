@@ -10,6 +10,7 @@ import {
   NativeSelect,
   Switch,
   Badge,
+  Span,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { Controller } from "react-hook-form";
@@ -30,7 +31,6 @@ export default function ClienteModal({
   clienteEditando,
 }) {
   const [checked, setChecked] = useState(true);
-
   const status = useWatch({ control, name: "status" });
 
   // Carrega o estado inicial do status só uma vez no modo edição
@@ -68,12 +68,40 @@ export default function ClienteModal({
               <Field.Label>
                 Nome <Field.RequiredIndicator />{" "}
               </Field.Label>
-              <Input
-                placeholder="Nome completo ou razão social"
-                {...register("nome", {
+              <Controller
+                name="nome"
+                control={control}
+                rules={{
                   required: "Nome é obrigatório",
-                })}
+                  maxLength: {
+                    value: 100,
+                    message: "Limite máximo de 100 caracteres",
+                  },
+                }}
+                render={({ field }) => {
+                  const length = (field.value || "").length;
+                  return (
+                    <InputGroup
+                      endElement={
+                        <Span
+                          color={length > 50 ? "danger" : "fg.muted"}
+                          textStyle="xs"
+                          className="!bg-white !pl-2 !py-1"
+                        >
+                          {length} / 50
+                        </Span>
+                      }
+                    >
+                      <Input
+                        {...field}
+                        maxLength={50} // opcional: permite digitar até 120, mas valida só até 100
+                        placeholder="Nome completo ou razão social"
+                      />
+                    </InputGroup>
+                  );
+                }}
               />
+
               <Field.ErrorText>{errors.nome?.message}</Field.ErrorText>
             </Field.Root>
 
@@ -324,12 +352,41 @@ export default function ClienteModal({
             columns={{ base: 1, md: 2 }}
             className="gap-x-10 gap-y-3 !px-3"
           >
-            <Field.Root>
+            <Field.Root invalid={!!errors.observacoes}>
               <Field.Label>Observações</Field.Label>
-              <Input
-                placeholder="Observações..."
-                {...register("observacoes")}
+              <Controller
+                name="observacoes"
+                control={control}
+                rules={{
+                  maxLength: {
+                    value: 200,
+                    message: "Limite máximo de 200 caracteres",
+                  },
+                }}
+                render={({ field }) => {
+                  const length = (field.value || "").length;
+                  return (
+                    <InputGroup
+                      endElement={
+                        <Span
+                          color={length > 200 ? "danger" : "fg.muted"}
+                          textStyle="xs"
+                          className="!bg-white !pl-2 !py-1"
+                        >
+                          {length} / 200
+                        </Span>
+                      }
+                    >
+                      <Input
+                        {...field}
+                        maxLength={200} // impede digitar mais que 200
+                        placeholder="Observações..."
+                      />
+                    </InputGroup>
+                  );
+                }}
               />
+              <Field.ErrorText>{errors.observacoes?.message}</Field.ErrorText>
             </Field.Root>
 
             <Field.Root>

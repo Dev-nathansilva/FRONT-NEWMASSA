@@ -217,7 +217,7 @@ export default function CustomTable({
     <div className=" relative">
       <div className="relative flex gap-3 items-center">
         {/* CAMPO DE PESQUISA */}
-        <div className="w-[400px] ">
+        <div className="w-[400px] !mt-1">
           <InputGroup
             flex="1"
             startElement={<FiSearch className="text-gray-400" />}
