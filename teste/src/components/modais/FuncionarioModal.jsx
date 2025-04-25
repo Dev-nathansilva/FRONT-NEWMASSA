@@ -7,6 +7,7 @@ import {
   Field,
   Input,
   InputGroup,
+  NativeSelect,
   Switch,
   Badge,
   Span,
@@ -16,9 +17,17 @@ import { withMask } from "use-mask-input";
 import { HiCheck, HiX } from "react-icons/hi";
 import { NumericFormat } from "react-number-format";
 
-export default function VendedorModal({ register, control, errors, setValue }) {
+export default function FuncionarioModal({
+  register,
+  control,
+  //   handleCargoChange,
+  errors,
+  cargo,
+  documentoRef,
+  setValue,
+}) {
   return (
-    <form id="formVendedor">
+    <form id="formFuncionario">
       <Stack spacing={6} className="!flex !flex-col !gap-10">
         {/* DADOS CADASTRAIS */}
         <Box>
@@ -43,8 +52,8 @@ export default function VendedorModal({ register, control, errors, setValue }) {
                 rules={{
                   required: "Nome é obrigatório",
                   maxLength: {
-                    value: 50,
-                    message: "Limite máximo de 50 caracteres",
+                    value: 100,
+                    message: "Limite máximo de 100 caracteres",
                   },
                 }}
                 render={({ field }) => {
@@ -53,7 +62,7 @@ export default function VendedorModal({ register, control, errors, setValue }) {
                     <InputGroup
                       endElement={
                         <Span
-                          color={length > 50 ? "red" : "fg.muted"}
+                          color={length > 50 ? "danger" : "fg.muted"}
                           textStyle="xs"
                         >
                           {length} / 50
@@ -62,9 +71,9 @@ export default function VendedorModal({ register, control, errors, setValue }) {
                     >
                       <Input
                         {...field}
-                        maxLength={50}
-                        value={field.value || ""}
+                        maxLength={50} // opcional: permite digitar até 120, mas valida só até 100
                         placeholder="Nome completo ou razão social"
+                        value={field.value || ""}
                         className="!pr-17"
                       />
                     </InputGroup>
@@ -74,6 +83,35 @@ export default function VendedorModal({ register, control, errors, setValue }) {
 
               <Field.ErrorText>{errors.nome?.message}</Field.ErrorText>
             </Field.Root>
+
+            <Controller
+              name="cargo"
+              control={control}
+              rules={{ required: "Selecione um item da lista" }}
+              render={({ field }) => (
+                <Field.Root required invalid={!!errors.cargo}>
+                  <Field.Label>
+                    Cargo <Field.RequiredIndicator />
+                  </Field.Label>
+                  <NativeSelect.Root>
+                    <NativeSelect.Field
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                      }}
+                    >
+                      <option value="">Selecione um cargo</option>
+                      <option value="Analista">Analista</option>
+                      <option value="Assistente">Assistente</option>
+                      <option value="Gerente">Gerente</option>
+                      <option value="Caminhoneiro">Caminhoneiro</option>
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                  </NativeSelect.Root>
+                  <Field.ErrorText>{errors.cargo?.message}</Field.ErrorText>
+                </Field.Root>
+              )}
+            />
 
             <Field.Root required invalid={!!errors.email}>
               <Field.Label>
@@ -122,67 +160,6 @@ export default function VendedorModal({ register, control, errors, setValue }) {
               />
               <Field.ErrorText>{errors.telefone?.message}</Field.ErrorText>
             </Field.Root>
-
-            <Field.Root invalid={!!errors.comissao}>
-              <Field.Label>Comissão</Field.Label>
-              <InputGroup startAddon="%">
-                <Controller
-                  name="comissao"
-                  control={control}
-                  defaultValue={""}
-                  rules={{
-                    min: {
-                      value: 0,
-                      message: "A comissão não pode ser negativa",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="number"
-                      step="0.25"
-                      placeholder="0,00"
-                      min={0}
-                      value={field.value ?? 0}
-                    />
-                  )}
-                />
-              </InputGroup>
-              <Field.ErrorText>{errors.comissao?.message}</Field.ErrorText>
-            </Field.Root>
-
-            <Field.Root
-              orientation="horizontal"
-              className="!flex !justify-start !w-[210px] !p-2 !mt-3  !border !border-gray-200 rounded-full"
-            >
-              <Field.Label>Status</Field.Label>
-              <Controller
-                name="status"
-                control={control}
-                defaultValue="Ativo"
-                render={({ field: { value, onChange } }) => (
-                  <Switch.Root
-                    size="lg"
-                    checked={value === "Ativo"}
-                    onCheckedChange={(e) =>
-                      onChange(e.checked ? "Ativo" : "Inativo")
-                    }
-                  >
-                    <Switch.HiddenInput />
-                    <Switch.Control>
-                      <Switch.Thumb>
-                        <Switch.ThumbIndicator fallback={<HiX color="black" />}>
-                          <HiCheck />
-                        </Switch.ThumbIndicator>
-                      </Switch.Thumb>
-                    </Switch.Control>
-                    <Switch.Label>
-                      {value === "Ativo" ? "Ativo" : "Inativo"}
-                    </Switch.Label>
-                  </Switch.Root>
-                )}
-              />
-            </Field.Root>
           </SimpleGrid>
         </Box>
 
@@ -216,7 +193,7 @@ export default function VendedorModal({ register, control, errors, setValue }) {
                     <InputGroup
                       endElement={
                         <Span
-                          color={length > 200 ? "red" : "fg.muted"}
+                          color={length > 200 ? "danger" : "fg.muted"}
                           textStyle="xs"
                         >
                           {length} / 200

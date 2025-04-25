@@ -32,6 +32,7 @@ import {
 import { Badge, Button, CloseButton, Drawer } from "@chakra-ui/react";
 import { MdOutlineLabel } from "react-icons/md";
 import { BiPackage } from "react-icons/bi";
+import { RiPieChart2Fill } from "react-icons/ri";
 
 const filtrosIniciais = {
   status: [],
@@ -570,6 +571,10 @@ export default function FornecedoresTable({
               onClick={() => abrirDrawerComDados(row.original)}
             >
               <FiEye className=" text-black" title="Visualizar" />
+            </div>
+
+            <div className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg">
+              <RiPieChart2Fill className=" text-black" title="Visualizar" />
             </div>
 
             <div

@@ -72,7 +72,7 @@ export default function FornecedorModal({
                         maxLength={50}
                         value={field.value || ""}
                         placeholder="Nome completo ou razão social"
-                        className="!pr-14"
+                        className="!pr-17"
                       />
                     </InputGroup>
                   );

@@ -65,7 +65,6 @@ export default function ClienteModal({
                         <Span
                           color={length > 50 ? "danger" : "fg.muted"}
                           textStyle="xs"
-                          className="!bg-white !pl-2 !py-1"
                         >
                           {length} / 50
                         </Span>
@@ -75,6 +74,8 @@ export default function ClienteModal({
                         {...field}
                         maxLength={50} // opcional: permite digitar até 120, mas valida só até 100
                         placeholder="Nome completo ou razão social"
+                        value={field.value || ""}
+                        className="!pr-17"
                       />
                     </InputGroup>
                   );
@@ -356,7 +357,6 @@ export default function ClienteModal({
                         <Span
                           color={length > 200 ? "danger" : "fg.muted"}
                           textStyle="xs"
-                          className="!bg-white !pl-2 !py-1"
                         >
                           {length} / 200
                         </Span>
@@ -365,7 +365,9 @@ export default function ClienteModal({
                       <Input
                         {...field}
                         maxLength={200} // impede digitar mais que 200
+                        value={field.value || ""}
                         placeholder="Observações..."
+                        className="!pr-17"
                       />
                     </InputGroup>
                   );
