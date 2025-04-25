@@ -1,7 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import CustomTable from "../components/CustomTable";
 import debounce from "lodash.debounce";
 import { Toaster, toaster } from "@/components/ui/toaster";
+import { FaRegIdCard, FaUserCircle } from "react-icons/fa";
+import { BsClipboardFill } from "react-icons/bs";
+import { FaBoxOpen, FaPhone } from "react-icons/fa6";
+
 import {
   BsChevronExpand,
   BsFillCaretUpFill,
@@ -12,6 +16,8 @@ import { FiMail, FiEdit, FiTrash2, FiRefreshCcw, FiEye } from "react-icons/fi";
 import usePopupManager from "../hooks/popupmanager";
 import { useCallback } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import { GoOrganization } from "react-icons/go";
+
 import { IoClose } from "react-icons/io5";
 import "../../src/styles/Pages.css";
 import {
@@ -23,15 +29,23 @@ import {
   FaEdit,
   FaWhatsapp,
 } from "react-icons/fa";
+import { Badge, Button, CloseButton, Drawer } from "@chakra-ui/react";
+import { MdOutlineLabel } from "react-icons/md";
+import { BiPackage } from "react-icons/bi";
+import { TbPercentage25 } from "react-icons/tb";
+import { RiMoneyDollarCircleLine } from "react-icons/ri";
 
 const filtrosIniciais = {
   status: [],
-  tipo: [],
   dataInicial: null,
   dataFinal: null,
 };
 
-export default function VendedoresTable({ fetchDataRef }) {
+export default function VendedoresTable({
+  fetchDataRef,
+  onVendedorEditandoChange,
+}) {
+  const [vendedorEditando, setVendedorEditando] = useState(null);
   const [vendedores, setVendedores] = useState([]);
   const [enableResizing, setEnableResizing] = useState(false);
   const [columnSizes, setColumnSizes] = useState({});
@@ -40,17 +54,19 @@ export default function VendedoresTable({ fetchDataRef }) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
   const [linhaSelecionada, setLinhaSelecionada] = useState(null);
-  const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [selectionResetKey, setSelectionResetKey] = useState(0);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const abrirPopupComDados = (linha) => {
+  const abrirDrawerComDados = (linha) => {
+    console.log(linha);
     setLinhaSelecionada(linha);
-    setMostrarPopup(true);
+    setIsDrawerOpen(true);
   };
 
   const debouncedSearchHandler = useCallback(
     debounce((value) => {
       setDebouncedSearch(value);
-    }, 500),
+    }, 300),
     []
   );
 
@@ -70,7 +86,9 @@ export default function VendedoresTable({ fetchDataRef }) {
 
   const [hiddenColumns, setHiddenColumns] = useState([
     "Email",
+    "Telefone",
     "Data de Cadastro",
+    "Observações",
   ]);
 
   //PAGINAÇÃO
@@ -86,15 +104,30 @@ export default function VendedoresTable({ fetchDataRef }) {
       let newHiddenColumns = [];
 
       if (width <= 1140) {
-        newHiddenColumns = ["Email", "Data de Cadastro"];
+        newHiddenColumns = [
+          "Email",
+          "Telefone",
+          "Data de Cadastro",
+          "Observações",
+        ];
       } else if (width <= 1339) {
-        newHiddenColumns = ["Email", "Data de Cadastro"];
+        newHiddenColumns = [
+          "Email",
+          "Telefone",
+          "Data de Cadastro",
+          "Observações",
+        ];
       } else if (width <= 1639) {
-        newHiddenColumns = ["Email", "Data de Cadastro"];
+        newHiddenColumns = [
+          "Email",
+          "Telefone",
+          "Data de Cadastro",
+          "Observações",
+        ];
       } else if (width <= 1920) {
-        newHiddenColumns = ["Data de Cadastro"];
+        newHiddenColumns = ["Telefone", "Data de Cadastro", "Observações"];
       } else {
-        newHiddenColumns = ["Data de Cadastro"];
+        newHiddenColumns = ["Telefone", "Data de Cadastro", "Observações"];
       }
 
       setHiddenColumns(newHiddenColumns);
@@ -159,23 +192,23 @@ export default function VendedoresTable({ fetchDataRef }) {
         `http://localhost:5000/api/vendedores?${params.toString()}`
       );
       const data = await response.json();
-      console.log(data);
       const mappedData = data.data.map((vendedor) => ({
         id: vendedor.id,
         Nome: vendedor.nome,
-        status: vendedor.status,
-        Comissoes: vendedor.comissao,
+        Status: vendedor.status,
         Email: vendedor.email,
-        "Data de Cadastro": formatarData(vendedor.createAt),
-        dataCadastroRaw: vendedor.createAt,
-        Observacoes: vendedor.observacoes,
+        Telefone: vendedor.telefone,
+        ["Comissão (%)"]: vendedor.comissao,
+        "Data de Cadastro": formatarData(vendedor.createdAt),
+        dataCadastroRaw: vendedor.createdAt,
+        ["Observações"]: vendedor.observacoes,
       }));
 
       setVendedores(mappedData);
       setTotalPaginas(data.totalPages);
       setTotalItens(data.total);
     } catch (error) {
-      console.error("Erro ao buscar Vendedores:", error);
+      console.error("Erro ao buscar vendedores:", error);
     }
   }, [paginaAtual, itensPorPagina, debouncedSearch, filters]);
 
@@ -193,8 +226,8 @@ export default function VendedoresTable({ fetchDataRef }) {
         <div className="relative gap-3 flex items-center">
           <span>{config.label}</span>
           <div
-            className={`cursor-pointer filter-icon p-1 rounded-[4px] ${
-              isSelected ? "bg-blue-200" : "bg-gray-100 hover:bg-gray-300"
+            className={`cursor-pointer filter-icon !p-1 !rounded-[4px] ${
+              isSelected ? "!bg-blue-200" : "!bg-gray-100 hover:!bg-gray-300"
             }`}
             onClick={() => togglePopup(key)}
           >
@@ -205,14 +238,17 @@ export default function VendedoresTable({ fetchDataRef }) {
           {popupStates[key] && (
             <div
               ref={popupRefs[key]}
-              className="absolute top-9 w-60 bg-white border border-gray-200 rounded-md shadow-lg z-10 p-4"
+              className="absolute top-9 !w-60 bg-white border border-gray-200 !rounded-md shadow-lg z-10 !p-4"
             >
-              <h2 className="text-sm font-semibold mb-2">
+              <h2 className="!text-sm !font-semibold !mb-2">
                 Filtrar por {config.label}
               </h2>
-              <div className="flex flex-col gap-2 text-sm">
+              <div className="flex flex-col !gap-2 !text-sm">
                 {config.options.map((option) => (
-                  <label key={option.value} className="flex items-center gap-2">
+                  <label
+                    key={option.value}
+                    className="flex items-center !gap-2"
+                  >
                     <input
                       type="checkbox"
                       checked={selected.includes(option.value)}
@@ -237,7 +273,7 @@ export default function VendedoresTable({ fetchDataRef }) {
       <div className="relative gap-3 flex items-center">
         <span>Data de Cadastro</span>
         <div
-          className={`cursor-pointer filter-icon p-1 rounded-[4px] ${
+          className={`cursor-pointer filter-icon !p-1 !rounded-[4px] ${
             isActive ? "bg-blue-200" : "bg-gray-100 hover:bg-gray-300"
           }`}
           onClick={() => togglePopup("dataCadastro")}
@@ -252,17 +288,17 @@ export default function VendedoresTable({ fetchDataRef }) {
         {popupStates["dataCadastro"] && (
           <div
             ref={popupRefs["dataCadastro"]}
-            className="absolute top-9 w-72 bg-white border border-gray-200 rounded-md shadow-lg z-10 p-4"
+            className="absolute top-9 w-72 bg-white !border !border-gray-200 !rounded-md !shadow-lg z-10 !p-4"
           >
-            <h2 className="text-sm font-semibold mb-2">
+            <h2 className="!text-sm !font-semibold !mb-2">
               Filtrar por intervalo
             </h2>
-            <div className="flex flex-col gap-2 text-sm">
+            <div className="!flex !flex-col !gap-2 !text-sm">
               <label>
                 Data Inicial:
                 <input
                   type="date"
-                  className=" border px-2 py-1 rounded mt-1"
+                  className=" !border !px-2 !py-1 !rounded !mt-1"
                   value={filters.dataInicial || ""}
                   onChange={(e) =>
                     setFilters((prev) => ({
@@ -276,7 +312,7 @@ export default function VendedoresTable({ fetchDataRef }) {
                 Data Final:
                 <input
                   type="date"
-                  className=" border px-2 py-1 rounded mt-1"
+                  className=" !border !px-2 !py-1 !rounded !mt-1"
                   value={filters.dataFinal || ""}
                   onChange={(e) =>
                     setFilters((prev) => ({
@@ -316,11 +352,13 @@ export default function VendedoresTable({ fetchDataRef }) {
   const [columnOrder, setColumnOrder] = useState([
     "Selecionar",
     "Nome",
-    "Comissoes",
+    "Comissão (%)",
     "Email",
+    "Telefone",
     "Data de Cadastro",
-    "status",
-    "ações",
+    "Observações",
+    "Status",
+    "Ações",
   ]);
 
   // Componente reutilizável para cabeçalhos ordenáveis
@@ -372,6 +410,7 @@ export default function VendedoresTable({ fetchDataRef }) {
           />
         ),
         size: 70,
+        minSize: 60,
       },
       // COLUNA NOME
       {
@@ -382,19 +421,37 @@ export default function VendedoresTable({ fetchDataRef }) {
         ),
         enableSorting: true,
         enableResizing: true,
-        minSize: 200,
+        minSize: 150,
       },
-      // COLUNA STATUS
+
+      // COLUNA TELEFONE
       {
-        id: "status",
-        accessorKey: "status",
-        header: () => renderFilterHeader("status"),
+        id: "Telefone",
+        accessorKey: "Telefone",
         enableSorting: true,
         enableResizing: true,
         minSize: 200,
+      },
+      // COLUNA OBSERVACOES
+      {
+        id: "Observações",
+        accessorKey: "Observações",
+        enableSorting: true,
+        enableResizing: true,
+        minSize: 200,
+      },
+
+      // COLUNA STATUS
+      {
+        id: "Status",
+        accessorKey: "Status",
+        header: () => renderFilterHeader("status"),
+        enableSorting: true,
+        enableResizing: true,
+        minSize: 150,
         cell: ({ getValue }) => (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            className={`!px-3 !py-1 !rounded-full !text-xs !font-semibold ${
               getValue() === "Ativo"
                 ? "bg-green-100 text-green-600"
                 : "bg-red-100 text-red-600"
@@ -406,27 +463,52 @@ export default function VendedoresTable({ fetchDataRef }) {
       },
       // COLUNA AÇÕES
       {
-        id: "ações",
+        id: "Ações",
         accessorKey: "Ações",
         header: "Ações",
         cell: ({ row }) => (
-          <div className="flex gap-2 text-[19px]">
-            <FiEye
-              className="cursor-pointer text-black"
-              title="Visualizar"
-              onClick={() => abrirPopupComDados(row.original)}
-            />
-            <FiMail className="cursor-pointer text-black" />
-            <FiEdit className="cursor-pointer text-orange-500" />
-            <FiTrash2
-              className="cursor-pointer text-red-500"
-              onClick={() => handleDelete(row.original.id)}
-            />
+          <div className="flex gap-1 !text-[19px]">
+            <div
+              className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg"
+              onClick={() => abrirDrawerComDados(row.original)}
+            >
+              <FiEye className=" text-black" title="Visualizar" />
+            </div>
+
+            <div
+              className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg"
+              onClick={() => {
+                const rawPhone = row.original.Telefone;
+                if (rawPhone) {
+                  const cleanedPhone = rawPhone.replace(/\D/g, ""); // Remove tudo que não for número
+                  const whatsappUrl = `https://wa.me/55${cleanedPhone}`;
+                  window.open(whatsappUrl, "_blank");
+                } else {
+                  alert("Número WhatsApp não disponível");
+                }
+              }}
+            >
+              <FaWhatsapp className="text-black" />
+            </div>
+
+            <div
+              className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg"
+              onClick={() => handleSetVendedorEditando(row.original)}
+            >
+              <FiEdit className="text-orange-500" />
+            </div>
+
+            <div className="cursor-pointer !bg-[#f7f7f7] hover:!bg-[#dcdcdc] !p-1 !rounded-lg">
+              <FiTrash2
+                className=" text-red-500"
+                onClick={() => handleDelete(row.original.id)}
+              />
+            </div>
           </div>
         ),
         enableResizing,
         size: 150,
-        minSize: 150,
+        minSize: 170,
       },
       // COLUNA EMAIL
       {
@@ -434,30 +516,31 @@ export default function VendedoresTable({ fetchDataRef }) {
         header: "Email",
         accessorKey: "Email",
         enableHiding: true,
-        minSize: 200,
+        size: 200,
+        minSize: 150,
       },
+
       // COLUNA DATA DE CADASTRO
       {
         id: "Data de Cadastro",
         header: renderDateRangeFilterHeader,
         accessorKey: "Data de Cadastro",
         enableHiding: true,
-        minSize: 300,
+        size: 200,
+        minSize: 200,
       },
-      // COLUNA OBSERVACOES
+
+      // COLUNA COMISSAO
       {
-        id: "Observacoes",
-        accessorKey: "Observacoes",
-        enableHiding: true,
-        minSize: 300,
-      },
-      // COLUNA COMISSOES
-      {
-        id: "Comissoes",
-        accessorKey: "Comissoes",
+        id: "Comissão (%)",
+        accessorKey: "Comissão (%)",
+        header: ({ column }) => (
+          <SortableHeaderButton label="Comissão (%)" column={column} />
+        ),
         cell: ({ getValue }) => <span>{getValue()} %</span>,
         enableHiding: true,
-        minSize: 100,
+        size: 140,
+        minSize: 140,
       },
     ];
 
@@ -475,7 +558,7 @@ export default function VendedoresTable({ fetchDataRef }) {
   function BotaoLimparFiltros({ onClick }) {
     return (
       <button
-        className="cursor-pointer rounded text-sm font-medium text-gray-400 hover:text-gray-600 flex items-center gap-2"
+        className="cursor-pointer !rounded !text-sm font-medium !text-gray-400 hover:!text-gray-600 flex items-center gap-2 underline"
         onClick={onClick}
       >
         <IoClose /> Limpar Filtros
@@ -494,7 +577,7 @@ export default function VendedoresTable({ fetchDataRef }) {
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
-      "Tem certeza que deseja excluir este Vendedor?"
+      "Tem certeza que deseja excluir este vendedor?"
     );
     if (!confirmDelete) return;
 
@@ -528,6 +611,43 @@ export default function VendedoresTable({ fetchDataRef }) {
     }
   }, [fetchData, fetchDataRef]);
 
+  const drawerContentRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        drawerContentRef.current &&
+        !drawerContentRef.current.contains(event.target)
+      ) {
+        setIsDrawerOpen(false); // Fecha o Drawer se clicar fora do conteúdo
+      }
+    };
+
+    // Adiciona o eventListener quando o componente for montado
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    // Remove o eventListener quando o componente for desmontado
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
+  const Field = ({ label, value, icon }) => (
+    <div className=" !pb-2 !flex flex-col gap-1 !border-b ">
+      <div className="!flex items-center gap-2 !text-xs !text-gray-500">
+        {icon} {label}
+      </div>
+      <div className="!text-sm !font-medium !text-gray-800 !mt-1 truncate">
+        {value}
+      </div>
+    </div>
+  );
+
+  const handleSetVendedorEditando = (vendedor) => {
+    setVendedorEditando(vendedor);
+    if (onVendedorEditandoChange) onVendedorEditandoChange(vendedor);
+  };
+
   return (
     <div>
       <CustomTable
@@ -557,19 +677,19 @@ export default function VendedoresTable({ fetchDataRef }) {
         onRowSelectionChange={(selectedRows) => {
           setSelectedRows(selectedRows);
         }}
+        externalRowSelectionResetKey={selectionResetKey}
+        onRowDoubleClick={abrirDrawerComDados}
       />
 
-      <Toaster />
-
       {selectedRows.length > 0 && (
-        <div className="fixed bottom-4 left-[50%] -translate-x-1/2 bg-white shadow-lg border border-gray-300 rounded-lg px-6 py-4 z-50 flex items-center gap-4 animate-fade-in">
-          <span className="text-sm">
-            {selectedRows.length} Vendedor{selectedRows.length > 1 ? "es" : ""}{" "}
-            selecionado
+        <div className="fixed bottom-4 left-[50%] -translate-x-1/2 bg-white shadow-lg !border !border-gray-300 rounded-lg !px-6 !py-4 !z-50 !flex !items-center gap-4 animate-fade-in">
+          <span className="!text-sm">
+            {selectedRows.length} vendedor
+            {selectedRows.length > 1 ? "es" : ""} selecionado
             {selectedRows.length > 1 ? "s" : ""}
           </span>
           <button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 text-sm rounded"
+            className="!bg-red-500 hover:!bg-red-600 !text-white !px-4 !py-1.5 !text-sm !rounded"
             onClick={async () => {
               const confirm = window.confirm(
                 `Tem certeza que deseja deletar ${selectedRows.length} vendedor(es)?`
@@ -587,15 +707,16 @@ export default function VendedoresTable({ fetchDataRef }) {
 
                 if (response.ok) {
                   toaster.create({
-                    title: "Vendedores deletados",
+                    title: "vendedores deletados",
                     description: "Todos os selecionados foram removidos.",
                     type: "success",
                     duration: 3000,
                   });
                   fetchData(); // atualiza a lista
-                  setSelectedRows([]); // limpa seleção
+                  setSelectedRows([]);
+                  setSelectionResetKey((prev) => prev + 1);
                 } else {
-                  throw new Error("Erro ao deletar Vendedores.");
+                  throw new Error("Erro ao deletar vendedores.");
                 }
               } catch (error) {
                 toaster.error(error.message);
@@ -607,89 +728,141 @@ export default function VendedoresTable({ fetchDataRef }) {
         </div>
       )}
 
-      {mostrarPopup && linhaSelecionada && (
-        <div
-          className="fixed inset-0 z-[1000] flex justify-end"
-          onClick={() => setMostrarPopup(false)}
-        >
-          <div
-            className="bg-white w-full max-w-[300px] h-screen shadow-2xl flex flex-col relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Botão Fechar */}
-            <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
-              onClick={() => setMostrarPopup(false)}
-            >
-              <IoClose size={24} />
-            </button>
+      {linhaSelecionada && (
+        <Drawer.Root open={isDrawerOpen}>
+          <Drawer.Backdrop
+            className="!bg-[#00000021]"
+            onClick={() => setIsDrawerOpen(false)}
+          />
+          <Drawer.Positioner>
+            <Drawer.Content ref={drawerContentRef}>
+              <CloseButton
+                className="!absolute !top-2 !right-4 w-1 !text-gray-600 !bg-gray-100 hover:!bg-gray-200 !rounded-[10px] transition"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                }}
+              >
+                <IoClose size={24} />
+              </CloseButton>
 
-            {/* Cabeçalho */}
-            <div className="px-6 pt-6 pb-4 border-b">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Detalhes do Vendedor
-              </h2>
-            </div>
+              <Drawer.Header className="!px-6 !pt-6 !pb-4 !border-b">
+                <h2 className="!text-[20px] !font-semibold !text-gray-800 flex gap-3 items-center">
+                  <FaRegIdCard />
+                  Vendedor
+                </h2>
+              </Drawer.Header>
 
-            {/* Conteúdo scrollável */}
-            <div className="flex-grow overflow-y-auto pb-[100px] px-6 py-4 space-y-4 text-sm text-gray-700">
-              <div className="flex items-center gap-2">
-                <FaIdCard className="text-gray-500" />
-                <span>
-                  <strong>ID:</strong> {linhaSelecionada.id}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaUser className="text-gray-500" />
-                <span>
-                  <strong>Nome:</strong> {linhaSelecionada.Nome}
-                </span>
-              </div>
-              <div>
-                <strong>Status:</strong>{" "}
-                <span
-                  className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                    linhaSelecionada.status === "Ativo"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
+              <Drawer.Body className="!flex-grow !overflow-y-auto !pb-[70px] !px-6 !py-4 !space-y-6 !text-sm !text-gray-700">
+                {/* Nome no topo com destaque */}
+
+                <div className="flex justify-between items-center !mb-4 ">
+                  <div className="!text-xs !text-gray-500 !uppercase !mb-0">
+                    Código (ID)
+                  </div>
+                  <div className=" !text-[13px] !py-2 !px-5 !font-bold !text-gray-700 !bg-gray-100  !rounded-lg !inline-block ">
+                    {" "}
+                    {linhaSelecionada.id}
+                  </div>
+                </div>
+
+                <div className="!w-full !text-center !text-[14px] !text-gray-800 !font-semibold !bg-gray-100 !px-3 !py-4 !border !border-gray-400 !rounded-lg !inline-block">
+                  {linhaSelecionada.Nome}
+                </div>
+
+                {/* Seção - Dados Cadastrais */}
+                <div>
+                  <h3 className="!bg-gray-100 !text-center !py-2 rounded-[10px] !text-sm !font-bold !text-gray-600 !mb-4">
+                    Dados Cadastrais
+                  </h3>
+                  <div className="!space-y-4">
+                    {linhaSelecionada.Email && (
+                      <Field
+                        label="Email"
+                        value={linhaSelecionada.Email}
+                        icon={<FaEnvelope className="text-gray-500" />}
+                      />
+                    )}
+                    {linhaSelecionada.Telefone && (
+                      <Field
+                        label="Telefone"
+                        value={linhaSelecionada.Telefone}
+                        icon={<FaPhone className="text-gray-500" />}
+                      />
+                    )}
+
+                    {linhaSelecionada["Data de Cadastro"] && (
+                      <Field
+                        icon={<FaCalendarAlt className="text-gray-500" />}
+                        label="Data de Cadastro"
+                        value={linhaSelecionada["Data de Cadastro"]}
+                      />
+                    )}
+
+                    <Field
+                      icon={<TbPercentage25 className="text-gray-500" />}
+                      label="Comissão (%)"
+                      value={linhaSelecionada["Comissão (%)"]}
+                    />
+
+                    <Field
+                      label="Status"
+                      icon={<MdOutlineLabel />}
+                      value={
+                        <span
+                          className={`!inline-block !px-2 !py-0.5 !rounded-full !text-xs !font-medium ${
+                            linhaSelecionada.Status === "Ativo"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {linhaSelecionada.Status}
+                        </span>
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* Seção Informações Adicionais */}
+                <div>
+                  <h3 className="!bg-gray-100 !text-center !py-2 rounded-[10px] !text-sm !font-bold !text-gray-600 !mb-4">
+                    Informações Adicionais
+                  </h3>
+                  <div className="!space-y-4">
+                    <Field
+                      label="Observações"
+                      value={linhaSelecionada.Observações || "-"}
+                    />
+                  </div>
+                </div>
+              </Drawer.Body>
+
+              <Drawer.Footer className="!w-full !px-6 !py-4 !border-t flex flex-col gap-3 bg-white">
+                <button
+                  onClick={() => {
+                    setIsDrawerOpen(false); // fecha o drawer
+                    onVendedorEditandoChange(linhaSelecionada); // abre o modal no VendedoresPage
+                  }}
+                  className="!w-full flex items-center justify-center gap-2 !bg-blue-600 hover:!bg-blue-700 !text-white !font-semibold !py-3 !rounded-lg transition"
                 >
-                  {linhaSelecionada.status}
-                </span>
-              </div>
-              {linhaSelecionada.Email && (
-                <div className="flex items-center gap-2">
-                  <FaEnvelope className="text-gray-500" />
-                  <span>
-                    <strong>Email:</strong> {linhaSelecionada.Email}
-                  </span>
-                </div>
-              )}
-
-              {linhaSelecionada["Data de Cadastro"] && (
-                <div className="flex items-center gap-2">
-                  <FaCalendarAlt className="text-gray-500" />
-                  <span>
-                    <strong>Data de Cadastro:</strong>{" "}
-                    {linhaSelecionada["Data de Cadastro"]}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Rodapé fixo */}
-            <div className="w-full px-6 py-4 border-t flex flex-col gap-3 bg-white">
-              <button className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
-                <FaEdit className="text-[20px]" />
-                Editar Informações
-              </button>
-              <button className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg transition">
-                <FaWhatsapp className="text-[20px]" />
-                Enviar Mensagem
-              </button>
-            </div>
-          </div>
-        </div>
+                  <FaEdit className="!text-[20px]" />
+                  Editar Informações
+                </button>
+                <a
+                  href={`https://wa.me/send?phone=55${linhaSelecionada.Telefone.replace(
+                    /\D/g,
+                    ""
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="!no-underline !w-full flex items-center justify-center gap-2 !bg-green-500 hover:!bg-green-600 !text-white !font-semibold !py-3 !rounded-lg transition"
+                >
+                  <FaWhatsapp className="!text-[20px]" />
+                  Enviar Mensagem
+                </a>
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer.Positioner>
+        </Drawer.Root>
       )}
     </div>
   );

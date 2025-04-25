@@ -258,7 +258,7 @@ export default function CustomTable({
               <span className="bg-gray-200 !p-3 !w-full !rounded-[10px] !font-semibold text-center !mb-3">
                 Ocultar/Exibir Colunas
               </span>
-              <label className="block font-medium !mb-2">
+              <label className="flex items-center font-medium !mb-2">
                 <input
                   type="checkbox"
                   checked={Object.values(visibleColumns).every(Boolean)}
@@ -277,7 +277,7 @@ export default function CustomTable({
 
               {/* Checkboxes individuais para cada coluna */}
               {columns.map((col) => (
-                <label key={col.id} className="block">
+                <label key={col.id} className="flex items-center">
                   <input
                     type="checkbox"
                     checked={visibleColumns[col.id]}
