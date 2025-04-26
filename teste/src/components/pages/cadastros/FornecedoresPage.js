@@ -143,7 +143,7 @@ export default function FornecedoresPage() {
     setValue("documento", fornecedor.CNPJ || "");
     setValue("email", fornecedor.Email || "");
     setValue("telefone", fornecedor.Telefone || "");
-    setValue("status", fornecedor.Status || "Inativo");
+    setValue("status", fornecedor.Status ?? false);
     setValue("inscricaoEstadual", fornecedor["Inscrição Estadual"]);
 
     setValue("endereco", fornecedor.Endereço || "");

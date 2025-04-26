@@ -76,8 +76,8 @@ export default function VendedoresTable({
         key: "status",
         label: "Status",
         options: [
-          { value: "Ativo", label: "Ativo" },
-          { value: "Inativo", label: "Inativo" },
+          { value: "true", label: "Ativo" },
+          { value: "false", label: "Inativo" },
         ],
       },
     ],
@@ -452,12 +452,12 @@ export default function VendedoresTable({
         cell: ({ getValue }) => (
           <span
             className={`!px-3 !py-1 !rounded-full !text-xs !font-semibold ${
-              getValue() === "Ativo"
+              getValue()
                 ? "bg-green-100 text-green-600"
                 : "bg-red-100 text-red-600"
             }`}
           >
-            {getValue()}
+            {getValue() ? "Ativo" : "Inativo"}
           </span>
         ),
       },
@@ -810,12 +810,12 @@ export default function VendedoresTable({
                       value={
                         <span
                           className={`!inline-block !px-2 !py-0.5 !rounded-full !text-xs !font-medium ${
-                            linhaSelecionada.Status === "Ativo"
+                            linhaSelecionada.Status
                               ? "bg-green-100 text-green-700"
                               : "bg-red-100 text-red-700"
                           }`}
                         >
-                          {linhaSelecionada.Status}
+                          {linhaSelecionada.Status ? "Ativo" : "Inativo"}
                         </span>
                       }
                     />

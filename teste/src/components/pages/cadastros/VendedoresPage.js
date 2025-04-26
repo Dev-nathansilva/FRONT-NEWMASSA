@@ -135,7 +135,7 @@ export default function VendedoresPage() {
     setValue("nome", vendedor.Nome || "");
     setValue("email", vendedor.Email || "");
     setValue("telefone", vendedor.Telefone || "");
-    setValue("status", vendedor.Status || "Inativo");
+    setValue("status", vendedor.Status ?? false);
     setValue("comissao", vendedor["Comissão (%)"] || "Inativo");
 
     setValue("observacoes", vendedor["Observações"] || "");

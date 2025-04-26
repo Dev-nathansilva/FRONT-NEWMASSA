@@ -159,14 +159,12 @@ export default function VendedorModal({ register, control, errors, setValue }) {
               <Controller
                 name="status"
                 control={control}
-                defaultValue="Ativo"
+                defaultValue="true"
                 render={({ field: { value, onChange } }) => (
                   <Switch.Root
                     size="lg"
-                    checked={value === "Ativo"}
-                    onCheckedChange={(e) =>
-                      onChange(e.checked ? "Ativo" : "Inativo")
-                    }
+                    checked={value}
+                    onCheckedChange={(e) => onChange(e.checked)}
                   >
                     <Switch.HiddenInput />
                     <Switch.Control>
@@ -176,9 +174,7 @@ export default function VendedorModal({ register, control, errors, setValue }) {
                         </Switch.ThumbIndicator>
                       </Switch.Thumb>
                     </Switch.Control>
-                    <Switch.Label>
-                      {value === "Ativo" ? "Ativo" : "Inativo"}
-                    </Switch.Label>
+                    <Switch.Label>{value ? "Ativo" : "Inativo"}</Switch.Label>
                   </Switch.Root>
                 )}
               />
