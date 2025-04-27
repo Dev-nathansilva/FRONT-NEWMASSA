@@ -192,7 +192,7 @@ export default function FornecedorModal({
               <Controller
                 name="status"
                 control={control}
-                defaultValue="true"
+                defaultValue={true}
                 render={({ field: { value, onChange } }) => (
                   <Switch.Root
                     size="lg"

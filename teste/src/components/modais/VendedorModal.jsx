@@ -159,7 +159,7 @@ export default function VendedorModal({ register, control, errors, setValue }) {
               <Controller
                 name="status"
                 control={control}
-                defaultValue="true"
+                defaultValue={true}
                 render={({ field: { value, onChange } }) => (
                   <Switch.Root
                     size="lg"

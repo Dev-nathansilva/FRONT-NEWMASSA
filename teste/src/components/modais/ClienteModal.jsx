@@ -103,7 +103,7 @@ export default function ClienteModal({
                       }}
                     >
                       <option value="">Selecione um tipo</option>
-                      <option value="PessoaFisica">Pessoa Física</option>
+                      <option value="Pessoa Física">Pessoa Física</option>
                       <option value="Empresa">Empresa</option>
                     </NativeSelect.Field>
                     <NativeSelect.Indicator />
@@ -125,7 +125,7 @@ export default function ClienteModal({
                   validate: (value) => {
                     const onlyNumbers = value.replace(/\D/g, "");
 
-                    if (tipo === "PessoaFisica" && onlyNumbers.length !== 11) {
+                    if (tipo === "Pessoa Física" && onlyNumbers.length !== 11) {
                       return "CPF inválido";
                     }
 
@@ -146,7 +146,7 @@ export default function ClienteModal({
                       field.ref(el);
                       documentoRef.current = el;
                       if (el) {
-                        if (tipo === "PessoaFisica") {
+                        if (tipo === "Pessoa Física") {
                           withMask("999.999.999-99")(el);
                         } else if (tipo === "Empresa") {
                           withMask("99.999.999/9999-99")(el);
@@ -232,7 +232,7 @@ export default function ClienteModal({
               <Controller
                 name="status"
                 control={control}
-                defaultValue="true"
+                defaultValue={true}
                 render={({ field: { value, onChange } }) => (
                   <Switch.Root
                     size="lg"

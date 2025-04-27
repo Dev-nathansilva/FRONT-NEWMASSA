@@ -276,17 +276,19 @@ export default function CustomTable({
               </label>
 
               {/* Checkboxes individuais para cada coluna */}
-              {columns.map((col) => (
-                <label key={col.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={visibleColumns[col.id]}
-                    onChange={() => toggleColumnVisibility(col.id)}
-                    className="!mr-2"
-                  />
-                  {col.id}
-                </label>
-              ))}
+              {columns
+                .filter((col) => col.invisible !== true)
+                .map((col) => (
+                  <label key={col.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={visibleColumns[col.id]}
+                      onChange={() => toggleColumnVisibility(col.id)}
+                      className="!mr-2"
+                    />
+                    {col.id}
+                  </label>
+                ))}
             </div>
           )}
         </div>
