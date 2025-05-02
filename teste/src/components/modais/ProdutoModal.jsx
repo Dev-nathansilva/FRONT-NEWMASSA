@@ -35,6 +35,7 @@ import { NumericFormat } from "react-number-format";
 import { useEffect, useState } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { BsPlusCircleFill, BsSortNumericDown } from "react-icons/bs";
+
 import {
   MdInfo,
   MdAttachMoney,
@@ -42,7 +43,7 @@ import {
   MdLocalShipping,
 } from "react-icons/md";
 import { LuTriangleAlert } from "react-icons/lu";
-import { IoSearch } from "react-icons/io5";
+import { IoClose, IoSearch } from "react-icons/io5";
 import { toaster } from "../ui/toaster";
 import { useWatch, useFieldArray } from "react-hook-form";
 import { useRef } from "react";
@@ -61,10 +62,12 @@ export default function ProdutoModal({
   const [produtos, setProdutos] = useState([]);
   const [busca, setBusca] = useState("");
   const [quantidade, setQuantidade] = useState("");
-  // const [componentes, setComponentes] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [buscaFinalizada, setBuscaFinalizada] = useState(false);
+  const [mostrarResultados, setMostrarResultados] = useState(false);
+  const [mostrarResultadosFornecedores, setMostrarResultadosFornecedores] =
+    useState(false);
   const idProdutoEditando = watch("id");
   const {
     fields: composicoesFields,
@@ -79,50 +82,71 @@ export default function ProdutoModal({
     console.log("produtoSelecionado", produtoSelecionado);
   }, [produtoSelecionado]);
 
-  // Debounced fetch
+  const blocoPesquisaComponenteRef = useRef();
+  const blocoPesquisaFornecedorRef = useRef();
+
   useEffect(() => {
-    if (!busca.trim()) {
-      setProdutos([]);
-      setBuscaFinalizada(false); // reset
-      return;
+    function handleClickOutside(event) {
+      if (
+        blocoPesquisaComponenteRef.current &&
+        !blocoPesquisaComponenteRef.current.contains(event.target)
+      ) {
+        setMostrarResultados(false);
+      }
+
+      if (
+        blocoPesquisaFornecedorRef.current &&
+        !blocoPesquisaFornecedorRef.current.contains(event.target)
+      ) {
+        setMostrarResultadosFornecedores(false);
+      }
     }
 
-    const fetchProdutos = debounce(() => {
-      const params = new URLSearchParams({
-        search: busca,
-        // formato: "componente",
-        status: "true",
-        limit: "10",
-      });
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-      setIsLoading(true);
-      setBuscaFinalizada(false); // reset antes da nova requisição
+  const buscarProdutos = async (termo = "") => {
+    const params = new URLSearchParams({
+      search: termo,
+      status: "true",
+      limit: "10",
+    });
 
-      fetch(`http://localhost:5000/api/produtos?${params.toString()}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const todosProdutos = Array.isArray(data.data) ? data.data : [];
-          console.log("todosProdutos", todosProdutos);
-          const produtosFiltrados = todosProdutos.filter(
-            (p) => p.id !== idProdutoEditando
-          );
-          setProdutos(produtosFiltrados);
-          console.log("produtosFiltrados", produtosFiltrados);
-          setIsLoading(false);
-          setBuscaFinalizada(true); // só aqui indicamos que finalizou
-        })
-        .catch((err) => {
-          console.error("Erro ao buscar produtos:", err);
-          setIsLoading(false);
-          setBuscaFinalizada(true);
-        });
+    setIsLoading(true);
+    setBuscaFinalizada(false);
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/produtos?${params.toString()}`
+      );
+      const data = await res.json();
+
+      const todosProdutos = Array.isArray(data.data) ? data.data : [];
+      const produtosFiltrados = todosProdutos.filter(
+        (p) => p.id !== idProdutoEditando
+      );
+
+      setProdutos(produtosFiltrados);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+    } finally {
+      setIsLoading(false);
+      setBuscaFinalizada(true);
+    }
+  };
+
+  useEffect(() => {
+    const debouncedFetch = debounce(() => {
+      if (busca.trim()) {
+        buscarProdutos(busca);
+      }
     }, 400);
 
-    fetchProdutos();
-
-    return () => {
-      fetchProdutos.cancel();
-    };
+    debouncedFetch();
+    return () => debouncedFetch.cancel();
   }, [busca]);
 
   const adicionarComponente = () => {
@@ -189,41 +213,39 @@ export default function ProdutoModal({
     name: "fornecedores",
   });
 
-  useEffect(() => {
-    if (!buscaFornecedor.trim()) {
-      setFornecedores([]);
-      setBuscaFornecedorFinalizada(false);
-      return;
+  const buscarFornecedores = async (termo = "") => {
+    const params = new URLSearchParams({
+      search: termo,
+      limit: "10",
+    });
+
+    setFornecedorLoading(true);
+    setBuscaFornecedorFinalizada(false);
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/fornecedores?${params.toString()}`
+      );
+      const data = await res.json();
+
+      setFornecedores(Array.isArray(data.data) ? data.data : []);
+    } catch (error) {
+      console.error("Erro ao buscar fornecedores:", error);
+    } finally {
+      setFornecedorLoading(false);
+      setBuscaFornecedorFinalizada(true);
     }
+  };
 
-    const fetchFornecedores = debounce(() => {
-      const params = new URLSearchParams({
-        search: buscaFornecedor,
-        limit: "10",
-      });
-
-      setFornecedorLoading(true);
-      setBuscaFornecedorFinalizada(false);
-
-      fetch(`http://localhost:5000/api/fornecedores?${params.toString()}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setFornecedores(Array.isArray(data.data) ? data.data : []);
-          setFornecedorLoading(false);
-          setBuscaFornecedorFinalizada(true);
-        })
-        .catch((err) => {
-          console.error("Erro ao buscar fornecedores:", err);
-          setFornecedorLoading(false);
-          setBuscaFornecedorFinalizada(true);
-        });
+  useEffect(() => {
+    const debouncedFetch = debounce(() => {
+      if (buscaFornecedor.trim()) {
+        buscarFornecedores(buscaFornecedor);
+      }
     }, 400);
 
-    fetchFornecedores();
-
-    return () => {
-      fetchFornecedores.cancel();
-    };
+    debouncedFetch();
+    return () => debouncedFetch.cancel();
   }, [buscaFornecedor]);
 
   const adicionarFornecedor = (fornecedor) => {
@@ -877,53 +899,83 @@ export default function ProdutoModal({
                 spacing={4}
                 className="flex items-end gap-x-7 gap-y-5"
               >
-                <Box position="relative">
+                <Box position="relative" ref={blocoPesquisaComponenteRef}>
                   <Field.Root>
                     <Field.Label>Pesquisa</Field.Label>
-                    <InputGroup endAddon={<IoSearch />}>
+                    <InputGroup
+                      endAddon={
+                        produtoSelecionado ? (
+                          <button
+                            onClick={() => {
+                              setProdutoSelecionado(null);
+                              setBusca("");
+                              buscarProdutos();
+                              setMostrarResultados(true);
+                            }}
+                            className="text-gray-500 hover:text-gray-700"
+                          >
+                            <IoClose className="!text-[17px] !text-gray-500 hover:!text-gray-700" />
+                          </button>
+                        ) : (
+                          <IoSearch className="!text-[17px] !text-gray-500 hover:!text-gray-700" />
+                        )
+                      }
+                    >
                       <Input
                         placeholder="Buscar por componentes..."
                         value={busca}
+                        onFocus={() => {
+                          buscarProdutos(); // busca inicial
+                          setMostrarResultados(true);
+                        }}
                         className="relative"
                         onChange={(e) => {
                           setBusca(e.target.value);
                           setProdutoSelecionado(null);
+                          setMostrarResultados(true);
+
+                          if (e.target.value.trim() === "") {
+                            buscarProdutos();
+                          }
                         }}
-                        pr={isLoading ? "2.5rem" : undefined} // espaço para spinner à direita
+                        pr={isLoading ? "2.5rem" : undefined}
                       />
                     </InputGroup>
                   </Field.Root>
 
-                  {busca && !produtoSelecionado && produtos.length > 0 && (
-                    <List.Root
-                      position="absolute"
-                      top="100%"
-                      left="0"
-                      right="0"
-                      bg="white"
-                      border="1px solid #ccc"
-                      zIndex="10"
-                      maxH="200px"
-                      overflowY="auto"
-                    >
-                      {produtos.map((produto) => (
-                        <List.Item
-                          key={produto.id}
-                          px={3}
-                          py={2}
-                          cursor="pointer"
-                          _hover={{ bg: "gray.100" }}
-                          onClick={() => {
-                            setProdutoSelecionado(produto);
-                            setBusca(produto.descricao);
-                          }}
-                        >
-                          {produto.descricao}
-                        </List.Item>
-                      ))}
-                    </List.Root>
-                  )}
-                  {busca &&
+                  {mostrarResultados &&
+                    !produtoSelecionado &&
+                    produtos.length > 0 && (
+                      <List.Root
+                        position="absolute"
+                        top="100%"
+                        left="0"
+                        right="0"
+                        bg="white"
+                        border="1px solid #ccc"
+                        zIndex="10"
+                        maxH="200px"
+                        overflowY="auto"
+                      >
+                        {produtos.map((produto) => (
+                          <List.Item
+                            key={produto.id}
+                            px={3}
+                            py={2}
+                            cursor="pointer"
+                            _hover={{ bg: "gray.100" }}
+                            onClick={() => {
+                              setProdutoSelecionado(produto);
+                              setBusca(produto.descricao);
+                              setMostrarResultados(false);
+                            }}
+                          >
+                            {produto.descricao}
+                          </List.Item>
+                        ))}
+                      </List.Root>
+                    )}
+                  {mostrarResultados &&
                     !produtoSelecionado &&
                     !isLoading &&
                     buscaFinalizada &&
@@ -1088,7 +1140,11 @@ export default function ProdutoModal({
             >
               Fornecedores
             </Heading>
-            <Box position="relative" className="max-w-2xl">
+            <Box
+              position="relative"
+              className="max-w-2xl"
+              ref={blocoPesquisaFornecedorRef}
+            >
               <Field.Root>
                 <Field.Label>Pesquisa</Field.Label>
                 <InputGroup endAddon={<IoSearch />}>
@@ -1096,12 +1152,23 @@ export default function ProdutoModal({
                     placeholder="Buscar fornecedor..."
                     value={buscaFornecedor}
                     className="relative"
-                    onChange={(e) => setBuscaFornecedor(e.target.value)}
+                    onFocus={() => {
+                      buscarFornecedores();
+                      setMostrarResultadosFornecedores(true);
+                    }}
+                    onChange={(e) => {
+                      setBuscaFornecedor(e.target.value);
+                      setMostrarResultadosFornecedores(true);
+
+                      if (e.target.value.trim() === "") {
+                        buscarFornecedores();
+                      }
+                    }}
                   />
                 </InputGroup>
               </Field.Root>
 
-              {buscaFornecedor &&
+              {mostrarResultadosFornecedores &&
                 !fornecedorLoading &&
                 buscaFornecedorFinalizada && (
                   <List.Root
@@ -1124,7 +1191,10 @@ export default function ProdutoModal({
                           cursor="pointer"
                           _hover={{ bg: "gray.100" }}
                           className="!text-black !flex !justify-between !items-center"
-                          onClick={() => adicionarFornecedor(fornecedor)}
+                          onClick={() => {
+                            adicionarFornecedor(fornecedor);
+                            setMostrarResultadosFornecedores(false);
+                          }}
                         >
                           <Box>
                             <Text fontWeight="bold">{fornecedor.nome}</Text>
@@ -1138,9 +1208,11 @@ export default function ProdutoModal({
                             onClick={(e) => {
                               e.stopPropagation();
                               adicionarFornecedor(fornecedor);
+                              setMostrarResultadosFornecedores(false);
                             }}
+                            className="!bg-gray-200 !rounded-[10px] !flex !gap-2"
                           >
-                            Adicionar
+                            <BsPlusCircleFill /> Adicionar
                           </Button>
                         </List.Item>
                       ))

@@ -185,7 +185,7 @@ export default function ProdutosPage() {
     setValue("codigoBarrasGTIN", produto["Código GTIN"]);
     setValue("status", produto.Status ?? false);
     setValue("observacoes", produto["Observações"] || "");
-    setValue("dataValidade", produto["Data de Validade"] || "");
+    setValue("dataValidade", produto.dataValidadeRaw || "");
 
     setValue("origem", produto.Origem || "0");
     setValue("ncm", produto.NCM || "");
