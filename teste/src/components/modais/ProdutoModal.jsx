@@ -44,7 +44,7 @@ import {
 import { LuTriangleAlert } from "react-icons/lu";
 import { IoSearch } from "react-icons/io5";
 import { toaster } from "../ui/toaster";
-import { useWatch } from "react-hook-form";
+import { useWatch, useFieldArray } from "react-hook-form";
 import { useRef } from "react";
 
 export default function ProdutoModal({
@@ -53,36 +53,31 @@ export default function ProdutoModal({
   errors,
   setValue,
   watch,
-  produtoEditando,
 }) {
+  // -------------------------------------
+  // COMPOSIÇÕES
+  // -------------------------------------
+
   const [produtos, setProdutos] = useState([]);
   const [busca, setBusca] = useState("");
   const [quantidade, setQuantidade] = useState("");
-  const [componentes, setComponentes] = useState([]);
+  // const [componentes, setComponentes] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [buscaFinalizada, setBuscaFinalizada] = useState(false);
+  const idProdutoEditando = watch("id");
+  const {
+    fields: composicoesFields,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "composicoes",
+  });
 
-  // ATUALIZO PARA ENVIAR PRO REACT HOOK FORM
   useEffect(() => {
-    setValue("composicoes", componentes);
-  }, [componentes, setValue]);
-
-  const composicoesWatch = useWatch({ name: "composicoes", control });
-
-  //CARREGO OS DADOS UMA VEZ
-  useEffect(() => {
-    if (Array.isArray(composicoesWatch) && composicoesWatch.length > 0) {
-      const formatadas = composicoesWatch.map((item) => ({
-        id: item.componente?.id ?? item.id,
-        descricao: item.componente?.descricao ?? item.descricao,
-        quantidade: item.quantidade,
-        estoque: item.componente?.estoque ?? item.estoque,
-      }));
-
-      setComponentes(formatadas);
-    }
-  }, [composicoesWatch]);
+    console.log("produtoSelecionado", produtoSelecionado);
+  }, [produtoSelecionado]);
 
   // Debounced fetch
   useEffect(() => {
@@ -95,7 +90,7 @@ export default function ProdutoModal({
     const fetchProdutos = debounce(() => {
       const params = new URLSearchParams({
         search: busca,
-        formato: "componente",
+        // formato: "componente",
         status: "true",
         limit: "10",
       });
@@ -106,7 +101,13 @@ export default function ProdutoModal({
       fetch(`http://localhost:5000/api/produtos?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
-          setProdutos(Array.isArray(data.data) ? data.data : []);
+          const todosProdutos = Array.isArray(data.data) ? data.data : [];
+          console.log("todosProdutos", todosProdutos);
+          const produtosFiltrados = todosProdutos.filter(
+            (p) => p.id !== idProdutoEditando
+          );
+          setProdutos(produtosFiltrados);
+          console.log("produtosFiltrados", produtosFiltrados);
           setIsLoading(false);
           setBuscaFinalizada(true); // só aqui indicamos que finalizou
         })
@@ -142,47 +143,51 @@ export default function ProdutoModal({
       });
       return;
     }
-    const jaExiste = componentes.some((c) => c.id === produtoSelecionado.id);
+
+    const jaExiste = composicoesFields.some(
+      (c) => c.componente.id === produtoSelecionado.id
+    );
     if (jaExiste) {
       toaster.create({
-        description: "Componente se encontra está na Lista",
+        description: "Componente já está na lista",
         type: "warning",
         duration: 1500,
       });
       return;
     }
 
-    setComponentes((prev) => [
-      ...prev,
-      {
+    append({
+      componente: {
         id: produtoSelecionado.id,
         descricao: produtoSelecionado.descricao,
-        quantidade,
         estoque: produtoSelecionado.estoque,
       },
-    ]);
+      quantidade: Number(quantidade),
+    });
 
     setProdutoSelecionado(null);
     setBusca("");
     setQuantidade("");
-    setValue("composicoes", componentes, { shouldDirty: true });
   };
 
-  const removerComponente = (id) => {
-    setComponentes((prev) => prev.filter((comp) => comp.id !== id));
-    setValue("composicoes", componentes, { shouldDirty: true });
-  };
+  // -------------------------------------
+  // FORNECEDORES
+  // -------------------------------------
 
   const [fornecedores, setFornecedores] = useState([]);
-  const [fornecedoresSelecionados, setFornecedoresSelecionados] = useState([]);
   const [buscaFornecedor, setBuscaFornecedor] = useState("");
   const [fornecedorLoading, setFornecedorLoading] = useState(false);
   const [buscaFornecedorFinalizada, setBuscaFornecedorFinalizada] =
     useState(false);
 
-  useEffect(() => {
-    setValue("fornecedores", fornecedoresSelecionados);
-  }, [fornecedoresSelecionados, setValue]);
+  const {
+    fields: fornecedoresFields,
+    append: appendFornecedor,
+    remove: removeFornecedor,
+  } = useFieldArray({
+    control,
+    name: "fornecedores",
+  });
 
   useEffect(() => {
     if (!buscaFornecedor.trim()) {
@@ -222,8 +227,8 @@ export default function ProdutoModal({
   }, [buscaFornecedor]);
 
   const adicionarFornecedor = (fornecedor) => {
-    const jaExiste = fornecedoresSelecionados.some(
-      (item) => item.id === fornecedor.id
+    const jaExiste = fornecedoresFields.some(
+      (item) => item.fornecedor.id === fornecedor.id
     );
 
     if (jaExiste) {
@@ -235,14 +240,14 @@ export default function ProdutoModal({
       return;
     }
 
-    setFornecedoresSelecionados((prev) => [...prev, fornecedor]);
+    appendFornecedor({
+      fornecedor: {
+        id: fornecedor.id,
+        nome: fornecedor.nome,
+        documento: fornecedor.documento,
+      },
+    });
     setBuscaFornecedor("");
-  };
-
-  const removerFornecedor = (id) => {
-    setFornecedoresSelecionados(
-      fornecedoresSelecionados.filter((item) => item.id !== id)
-    );
   };
 
   const camposPorAba = {
@@ -279,6 +284,12 @@ export default function ProdutoModal({
 
   const formato = watch("formato");
   const isComponente = formato === "Componente";
+
+  useEffect(() => {
+    if (formato === "Componente" && composicoesFields.length > 0) {
+      remove();
+    }
+  }, [formato]);
 
   return (
     <form id="formProduto">
@@ -881,16 +892,6 @@ export default function ProdutoModal({
                         pr={isLoading ? "2.5rem" : undefined} // espaço para spinner à direita
                       />
                     </InputGroup>
-                    {/* {isLoading && (
-                      <Spinner
-                        size="sm"
-                        position="absolute"
-                        right="0.75rem"
-                        top="50%"
-                        color="gray.500"
-                        className="translate-y-[-50%]"
-                      />
-                    )} */}
                   </Field.Root>
 
                   {busca && !produtoSelecionado && produtos.length > 0 && (
@@ -1018,73 +1019,48 @@ export default function ProdutoModal({
                   </Table.Header>
 
                   <Table.Body>
-                    {Array.isArray(componentes) && componentes.length === 0 ? (
+                    {composicoesFields.length === 0 ? (
                       <Table.Row>
                         <Table.Cell
                           colSpan={5}
                           py={4}
                           textAlign="center"
-                          className="!text-gray-400 "
+                          className="!text-gray-400"
                         >
                           <LuTriangleAlert className="!inline-block !mr-2 !mt-[-2px]" />
                           Nenhum componente cadastrado
                         </Table.Cell>
                       </Table.Row>
                     ) : (
-                      componentes.map((comp, index) => (
+                      composicoesFields.map((comp, index) => (
                         <Table.Row
                           key={comp.id}
                           bg={index % 2 === 0 ? "white" : "gray.50"}
                           _hover={{ bg: "gray.100" }}
                         >
-                          <Table.Cell
-                            py={3}
-                            px={4}
-                            w="15%"
-                            whiteSpace="nowrap"
-                            overflow="hidden"
-                            textOverflow="ellipsis"
-                            isTruncated
-                          >
-                            {comp.id}
+                          <Table.Cell py={3} px={4} w="15%">
+                            {comp.componente.id}
                           </Table.Cell>
-                          <Table.Cell
-                            py={3}
-                            px={4}
-                            w="40%"
-                            whiteSpace="nowrap"
-                            overflow="hidden"
-                            textOverflow="ellipsis"
-                            isTruncated
-                          >
-                            {comp.descricao}
+                          <Table.Cell py={3} px={4} w="40%">
+                            {comp.componente.descricao}
                           </Table.Cell>
-                          <Table.Cell
-                            py={3}
-                            px={4}
-                            w="15%"
-                            whiteSpace="nowrap"
-                            overflow="hidden"
-                            textOverflow="ellipsis"
-                            isTruncated
-                          >
-                            {comp.quantidade}
+                          <Table.Cell py={3} px={4} w="15%">
+                            <Input
+                              type="number"
+                              min={0}
+                              {...register(`composicoes.${index}.quantidade`, {
+                                valueAsNumber: true,
+                              })}
+                              className="!w-20"
+                            />
                           </Table.Cell>
-                          <Table.Cell
-                            py={3}
-                            px={4}
-                            w="15%"
-                            whiteSpace="nowrap"
-                            overflow="hidden"
-                            textOverflow="ellipsis"
-                            isTruncated
-                          >
-                            {comp.estoque}
+                          <Table.Cell py={3} px={4} w="15%">
+                            {comp.componente.estoque}
                           </Table.Cell>
                           <Table.Cell py={3} px={4} w="15%">
                             <IconButton
                               aria-label="Remover"
-                              onClick={() => removerComponente(comp.id)}
+                              onClick={() => remove(index)}
                               size="sm"
                               variant="ghost"
                               colorScheme="red"
@@ -1200,10 +1176,10 @@ export default function ProdutoModal({
                 </Table.Header>
 
                 <Table.Body>
-                  {fornecedoresSelecionados.length > 0 ? (
-                    fornecedoresSelecionados.map((fornecedor, index) => (
+                  {fornecedoresFields.length > 0 ? (
+                    fornecedoresFields.map((fornecedor, index) => (
                       <Table.Row
-                        key={fornecedor.id}
+                        key={fornecedor.fornecedor.id}
                         bg={index % 2 === 0 ? "white" : "gray.50"}
                         _hover={{ bg: "gray.100" }}
                       >
@@ -1216,7 +1192,7 @@ export default function ProdutoModal({
                           textOverflow="ellipsis"
                           isTruncated
                         >
-                          {fornecedor.nome}
+                          {fornecedor.fornecedor.nome}
                         </Table.Cell>
                         <Table.Cell
                           py={3}
@@ -1227,12 +1203,12 @@ export default function ProdutoModal({
                           textOverflow="ellipsis"
                           isTruncated
                         >
-                          {fornecedor.documento}
+                          {fornecedor.fornecedor.documento}
                         </Table.Cell>
                         <Table.Cell py={3} px={4} w="15%">
                           <IconButton
                             aria-label="Remover"
-                            onClick={() => removerFornecedor(fornecedor.id)}
+                            onClick={() => removeFornecedor(index)}
                             size="sm"
                             variant="ghost"
                             colorScheme="red"

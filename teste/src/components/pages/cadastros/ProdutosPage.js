@@ -61,12 +61,12 @@ export default function ProdutosPage() {
     }
 
     const composicoesFormatadas = data.composicoes?.map((item) => ({
-      componenteId: item.id,
+      componenteId: item.componente.id,
       quantidade: parseFloat(item.quantidade) || 0,
     }));
 
     const fornecedoresFormatados = data.fornecedores?.map((item) => ({
-      fornecedorId: item.id,
+      fornecedorId: item.fornecedor.id,
     }));
 
     const payload = {
@@ -173,6 +173,7 @@ export default function ProdutosPage() {
   const [tableKey, setTableKey] = useState(0);
 
   const preencherFormulario = (produto) => {
+    setValue("id", produto.id || "");
     setValue("descricao", produto["Descrição"] || "");
     setValue("unidade", produto.Unidade || "Un");
     setValue("formato", produto.Formato || "Produto Final");
@@ -198,6 +199,7 @@ export default function ProdutosPage() {
     setValue("pesoBruto", produto["Peso Liquido"] || "");
     setValue("pesoLiquido", produto["CST PIS"] || "");
     setValue("composicoes", produto["Composições"]);
+    setValue("fornecedores", produto["Fornecedores"]);
   };
 
   useEffect(() => {
