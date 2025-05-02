@@ -109,6 +109,7 @@ export default function CustomTable({
       return acc;
     }, {})
   );
+
   // MOSTRAR COLUNAS OCULTAS
   const toggleColumnVisibility = (columnId) => {
     setVisibleColumns((prev) => ({
@@ -277,7 +278,7 @@ export default function CustomTable({
 
               {/* Checkboxes individuais para cada coluna */}
               {columns
-                .filter((col) => col.invisible !== true)
+                // .filter((col) => col.invisible !== true)
                 .map((col) => (
                   <label key={col.id} className="flex items-center">
                     <input

@@ -363,3 +363,39 @@ input:-webkit-autofill {
 .botao-teste:hover {
   background-color: #065bd1;
 }
+
+.abas-modal {
+  padding: 24px 40px;
+  font-size: 20px;
+  color: #4a5565;
+  background-color: #f3f4f6;
+  /* border-top-left-radius: 6px;
+  border-top-right-radius: 6px; */
+  border-radius: 6px;
+}
+.abas-modal:hover {
+  background-color: #e5e7eb;
+}
+
+.rs-picker-popup {
+  z-index: 9999 !important;
+  /* position: absolute !important;
+  top: 70px !important; */
+}
+
+.rs-picker .rs-input-group.rs-input-group-inside {
+  border-radius: 4px !important;
+  height: 40px;
+}
+
+.rs-picker-date > .rs-input-group.rs-input-group-inside .rs-input {
+  border-radius: 4px !important;
+}
+
+.rs-picker .rs-input-group.rs-input-group-inside .rs-input-group-addon {
+  height: 35px !important;
+}
+
+.rs-input-group:focus-within {
+  outline: 1px solid #000 !important;
+}
