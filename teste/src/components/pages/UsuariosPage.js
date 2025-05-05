@@ -52,11 +52,15 @@ export default function UsuariosPage() {
 
     for (const key in data) {
       if (key === "fotoPerfil") {
-        if (data[key] instanceof File) {
-          formData.append("fotoPerfil", data[key]);
-        } else {
-          formData.append("fotoPerfil", ""); // avisa que a imagem foi removida
+        const value = data[key];
+        if (value instanceof File) {
+          // nova imagem enviada
+          formData.append("fotoPerfil", value);
+        } else if (value === null) {
+          // imagem removida
+          formData.append("fotoPerfil", "");
         }
+        // se for string (imagem já existente), não faz nada
       } else {
         formData.append(key, data[key]);
       }
@@ -82,6 +86,31 @@ export default function UsuariosPage() {
         setIsModalOpen(false);
         resetForm();
         setUsuarioEditando(null);
+
+        const idFromFormData = formData.get("id");
+        const idElement = document.querySelector(".id-user");
+
+        if (idElement && idElement.textContent === idFromFormData) {
+          const nomeElement = document.getElementById("nome-user");
+          const nivelElement = document.getElementById("nivel-user");
+          const fotoElement = document.getElementById("foto-perfil-user");
+
+          if (nomeElement) nomeElement.textContent = result.user.name;
+          if (nivelElement) nivelElement.textContent = result.user.nivel;
+
+          if (fotoElement) {
+            const fotoPerfil = result.user.fotoPerfil;
+            if (fotoPerfil) {
+              // Usa o valor retornado do banco
+              const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}/uploads/${fotoPerfil}`;
+              fotoElement.src = imageUrl;
+            } else {
+              // Usa a imagem padrão se não houver foto
+              fotoElement.src = "/images-perfil/foto-perfil-anonima.png";
+            }
+          }
+        }
+
         toaster.create({
           title: isEditing ? "Usuário Atualizado!" : "Usuário Novo!",
           description: isEditing

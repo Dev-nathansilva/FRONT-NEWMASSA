@@ -124,18 +124,19 @@ export default function Topbar({
           <Box className="container-perfil ">
             <Box>
               <Image
+                id="foto-perfil-user"
                 src={profileImage}
                 alt="Foto de perfil"
                 boxSize="50px"
                 borderRadius="full"
-                fit="cover"
+                fit="fill"
               />
             </Box>
             <Box>
-              <Text className="!font-bold text-black">
+              <Text id="nome-user" className="!font-bold text-black">
                 {user?.name || "Usuário"}
               </Text>
-              <Text className="!text-gray-500 text-sm !m-0">
+              <Text id="nivel-user" className="!text-gray-500 text-sm !m-0">
                 {user?.nivel || "Sem nível"}
               </Text>
               <Text className="id-user hidden">{user?.userId || "-"}</Text>
