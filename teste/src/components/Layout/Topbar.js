@@ -18,6 +18,7 @@ import { RxGear } from "react-icons/rx";
 import { LuSearch } from "react-icons/lu";
 import { MdBackup } from "react-icons/md";
 import { toaster } from "../ui/toaster";
+import { useEffect } from "react";
 
 export default function Topbar({
   user,
@@ -30,7 +31,9 @@ export default function Topbar({
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const profileImage = user?.foto || "../images-perfil/foto-perfil-anonima.png";
+  const profileImage = user?.foto
+    ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${user.foto}`
+    : "/images-perfil/foto-perfil-anonima.png";
 
   const handleBackup = async () => {
     if (senha !== "dev") {
@@ -119,11 +122,15 @@ export default function Topbar({
             </Box>
           </Box>
           <Box className="container-perfil ">
-            <Image
-              src={profileImage}
-              alt="Foto de perfil"
-              className="w-10 h-10 rounded-full"
-            />
+            <Box>
+              <Image
+                src={profileImage}
+                alt="Foto de perfil"
+                boxSize="50px"
+                borderRadius="full"
+                fit="cover"
+              />
+            </Box>
             <Box>
               <Text className="!font-bold text-black">
                 {user?.name || "Usuário"}
@@ -131,6 +138,7 @@ export default function Topbar({
               <Text className="!text-gray-500 text-sm !m-0">
                 {user?.nivel || "Sem nível"}
               </Text>
+              <Text className="id-user hidden">{user?.userId || "-"}</Text>
             </Box>
           </Box>
         </Box>
