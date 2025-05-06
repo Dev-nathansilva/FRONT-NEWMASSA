@@ -207,6 +207,35 @@ export default function ClienteModal({
               <Field.ErrorText>{errors.telefone?.message}</Field.ErrorText>
             </Field.Root>
 
+            <Field.Root required invalid={!!errors.telefonefixo}>
+              <Field.Label>
+                Telefone Fixo <Field.RequiredIndicator />
+              </Field.Label>
+              <Controller
+                name="telefonefixo"
+                control={control}
+                rules={{
+                  required: "Telefone é obrigatório",
+                  validate: (value) => {
+                    const onlyNumbers = value.replace(/\D/g, "");
+                    return onlyNumbers.length === 10 || "Telefone inválido";
+                  },
+                }}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="(00) 0000-0000"
+                    ref={(el) => {
+                      field.ref(el);
+                      if (el) withMask("(99) 9999-9999")(el);
+                    }}
+                  />
+                )}
+              />
+              <Field.ErrorText>{errors.telefonefixo?.message}</Field.ErrorText>
+            </Field.Root>
+
             <Field.Root>
               <Field.Label>
                 Inscrição Estadual{" "}

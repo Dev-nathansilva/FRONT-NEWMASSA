@@ -19,6 +19,7 @@ import { LuUpload, LuX } from "react-icons/lu";
 import { Controller } from "react-hook-form";
 import { withMask } from "use-mask-input";
 import { PasswordInput } from "../ui/password-input";
+import { useEffect, useRef } from "react";
 
 export default function UsuarioModal({
   register,
@@ -26,9 +27,17 @@ export default function UsuarioModal({
   errors,
   documentoRef,
   setValue,
-  isEditando,
+  // isEditando,
   watch,
 }) {
+  // const isEditandoRef = useRef(isEditando);
+  // useEffect(() => {
+  //   isEditandoRef.current = isEditando;
+  // }, [isEditando]);
+
+  const id = watch("id");
+  const isEditando = !!id;
+
   return (
     <form id="formUsuario">
       <Stack spacing={6} className="!flex !flex-col !gap-10">

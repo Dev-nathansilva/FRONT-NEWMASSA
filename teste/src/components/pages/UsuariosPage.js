@@ -191,7 +191,7 @@ export default function UsuariosPage() {
     setValue("nivel", usuario.Nivel || "Padrão");
     setValue("email", usuario.Email || "");
     setValue("telefone", usuario.Telefone || "");
-    setValue("password", usuario.Senha || "");
+    // setValue("password", usuario.Senha || "");
     setValue("fotoPerfil", usuario.FotoPerfil || "");
   };
 
@@ -380,7 +380,7 @@ export default function UsuariosPage() {
                       errors={errors}
                       documentoRef={documentoRef}
                       setValue={setValue}
-                      isEditando={!!usuarioEditando}
+                      // isEditando={!!usuarioEditando}
                       watch={watch}
                     />
                   </Dialog.Body>
