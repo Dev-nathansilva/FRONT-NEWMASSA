@@ -71,7 +71,7 @@ export default function UsuarioModal({
                         <img
                           src={
                             typeof field.value === "string"
-                              ? `http://localhost:5000/uploads/${field.value}`
+                              ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${field.value}`
                               : URL.createObjectURL(field.value)
                           }
                           alt="Foto de perfil"

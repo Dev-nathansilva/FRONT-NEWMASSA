@@ -55,7 +55,7 @@ export default function FornecedoresPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/fornecedores${
+        `${process.env.NEXT_PUBLIC_API_URL}/api/fornecedores${
           isEditing ? `/${fornecedorEditando.id}` : ""
         }`,
         {
@@ -113,7 +113,7 @@ export default function FornecedoresPage() {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/fornecedores?limit=1000"
+        `${process.env.NEXT_PUBLIC_API_URL}/api/fornecedores?limit=1000`
       );
 
       if (!response.ok) {

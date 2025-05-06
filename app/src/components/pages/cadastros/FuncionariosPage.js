@@ -54,7 +54,7 @@ export default function FuncionariosPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/funcionarios${
+        `${process.env.NEXT_PUBLIC_API_URL}/api/funcionarios${
           isEditing ? `/${funcionarioEditando.id}` : ""
         }`,
         {
@@ -122,7 +122,7 @@ export default function FuncionariosPage() {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/funcionarios?limit=1000"
+        `${process.env.NEXT_PUBLIC_API_URL}/api/funcionarios?limit=1000`
       );
 
       if (!response.ok) {

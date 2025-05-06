@@ -250,7 +250,7 @@ export default function ClientesTable({
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/clientes?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/clientes?${params.toString()}`
       );
       const data = await response.json();
       const mappedData = data.data.map((cliente) => ({
@@ -718,9 +718,12 @@ export default function ClientesTable({
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/clientes/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         toaster.create({
@@ -836,7 +839,7 @@ export default function ClientesTable({
               try {
                 const ids = selectedRows.map((row) => row.id).join(",");
                 const response = await fetch(
-                  `http://localhost:5000/api/clientes/${ids}`,
+                  `${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${ids}`,
                   {
                     method: "DELETE",
                   }

@@ -179,7 +179,9 @@ export default function FuncionariosTable({
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/funcionarios?${params.toString()}`
+        `${
+          process.env.NEXT_PUBLIC_API_URL
+        }/api/funcionarios?${params.toString()}`
       );
       const data = await response.json();
       const mappedData = data.data.map((funcionario) => ({
@@ -531,7 +533,7 @@ export default function FuncionariosTable({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/funcionarios/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/funcionarios/${id}`,
         {
           method: "DELETE",
         }
@@ -647,7 +649,7 @@ export default function FuncionariosTable({
               try {
                 const ids = selectedRows.map((row) => row.id).join(",");
                 const response = await fetch(
-                  `http://localhost:5000/api/funcionarios/${ids}`,
+                  `${process.env.NEXT_PUBLIC_API_URL}/api/funcionarios/${ids}`,
                   {
                     method: "DELETE",
                   }

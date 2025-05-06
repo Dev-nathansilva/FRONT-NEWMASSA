@@ -78,7 +78,7 @@ export default function ProdutosPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/produtos${
+        `${process.env.NEXT_PUBLIC_API_URL}/api/produtos${
           isEditing ? `/${produtoEditando.id}` : ""
         }`,
         {
@@ -147,7 +147,7 @@ export default function ProdutosPage() {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/produtos?limit=1000"
+        `${process.env.NEXT_PUBLIC_API_URL}/api/produtos?limit=1000`
       );
 
       if (!response.ok) {

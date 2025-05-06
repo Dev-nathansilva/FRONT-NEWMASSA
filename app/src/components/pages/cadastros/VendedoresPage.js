@@ -50,7 +50,7 @@ export default function VendedoresPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/vendedores${
+        `${process.env.NEXT_PUBLIC_API_URL}/api/vendedores${
           isEditing ? `/${vendedorEditando.id}` : ""
         }`,
         {
@@ -106,7 +106,7 @@ export default function VendedoresPage() {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/vendedores?limit=1000"
+        `${process.env.NEXT_PUBLIC_API_URL}/api/vendedores?limit=1000`
       );
 
       if (!response.ok) {

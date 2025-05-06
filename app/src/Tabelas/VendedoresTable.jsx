@@ -189,7 +189,7 @@ export default function VendedoresTable({
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/vendedores?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/vendedores?${params.toString()}`
       );
       const data = await response.json();
       const mappedData = data.data.map((vendedor) => ({
@@ -583,7 +583,7 @@ export default function VendedoresTable({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/vendedores/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/vendedores/${id}`,
         {
           method: "DELETE",
         }
@@ -699,7 +699,7 @@ export default function VendedoresTable({
               try {
                 const ids = selectedRows.map((row) => row.id).join(",");
                 const response = await fetch(
-                  `http://localhost:5000/api/vendedores/${ids}`,
+                  `${process.env.NEXT_PUBLIC_API_URL}/api/vendedores/${ids}`,
                   {
                     method: "DELETE",
                   }

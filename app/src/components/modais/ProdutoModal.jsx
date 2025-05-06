@@ -120,7 +120,7 @@ export default function ProdutoModal({
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/produtos?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/produtos?${params.toString()}`
       );
       const data = await res.json();
 
@@ -224,8 +224,11 @@ export default function ProdutoModal({
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/fornecedores?${params.toString()}`
+        `${
+          process.env.NEXT_PUBLIC_API_URL
+        }/api/fornecedores?${params.toString()}`
       );
+
       const data = await res.json();
 
       setFornecedores(Array.isArray(data.data) ? data.data : []);

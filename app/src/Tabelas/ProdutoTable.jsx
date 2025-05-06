@@ -275,7 +275,7 @@ export default function ProdutosTable({
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/produtos?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/produtos?${params.toString()}`
       );
       const data = await response.json();
       console.log("data", data);
@@ -797,9 +797,12 @@ export default function ProdutosTable({
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/produtos/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/produtos/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         toaster.create({
@@ -920,7 +923,7 @@ export default function ProdutosTable({
               try {
                 const ids = selectedRows.map((row) => row.id).join(",");
                 const response = await fetch(
-                  `http://localhost:5000/api/produtos/${ids}`,
+                  `${process.env.NEXT_PUBLIC_API_URL}/api/produtos/${ids}`,
                   {
                     method: "DELETE",
                   }

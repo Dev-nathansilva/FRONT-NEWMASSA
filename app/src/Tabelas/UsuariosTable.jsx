@@ -183,7 +183,7 @@ export default function UsuariosTable({
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/usuarios?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/usuarios?${params.toString()}`
       );
       const data = await response.json();
       const mappedData = data.data.map((usuario) => ({
@@ -540,9 +540,12 @@ export default function UsuariosTable({
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/usuarios/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/usuarios/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         toaster.create({
@@ -676,7 +679,7 @@ export default function UsuariosTable({
                 const isDeletingOwnUser = ids.includes(loggedUserId);
 
                 const response = await fetch(
-                  `http://localhost:5000/api/usuarios/${ids}`,
+                  `${process.env.NEXT_PUBLIC_API_URL}/api/usuarios/${ids}`,
                   {
                     method: "DELETE",
                   }

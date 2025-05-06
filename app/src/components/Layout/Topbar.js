@@ -47,7 +47,9 @@ export default function Topbar({
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/backup");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/backup`
+      );
       if (!response.ok) throw new Error("Erro ao fazer o backup");
 
       toaster.create({

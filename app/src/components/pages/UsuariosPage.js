@@ -70,7 +70,7 @@ export default function UsuariosPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/usuarios${
+        `${process.env.NEXT_PUBLIC_API_URL}/api/usuarios${
           isEditing ? `/${usuarioEditando.id}` : ""
         }`,
         {
@@ -160,7 +160,7 @@ export default function UsuariosPage() {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/usuarios?limit=1000"
+        `${process.env.NEXT_PUBLIC_API_URL}/api/usuarios?limit=1000`
       );
 
       if (!response.ok) {

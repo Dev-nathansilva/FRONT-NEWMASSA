@@ -256,7 +256,9 @@ export default function FornecedoresTable({
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/fornecedores?${params.toString()}`
+        `${
+          process.env.NEXT_PUBLIC_API_URL
+        }/api/fornecedores?${params.toString()}`
       );
       const data = await response.json();
       const mappedData = data.data.map((fornecedor) => ({
@@ -762,7 +764,7 @@ export default function FornecedoresTable({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/fornecedores/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/fornecedores/${id}`,
         {
           method: "DELETE",
         }
@@ -878,7 +880,7 @@ export default function FornecedoresTable({
               try {
                 const ids = selectedRows.map((row) => row.id).join(",");
                 const response = await fetch(
-                  `http://localhost:5000/api/fornecedores/${ids}`,
+                  `${process.env.NEXT_PUBLIC_API_URL}/api/fornecedores/${ids}`,
                   {
                     method: "DELETE",
                   }
