@@ -162,6 +162,7 @@ export default function ClientesPage() {
     setValue("documento", cliente["CPF/CNPJ"] || "");
     setValue("email", cliente.Email || "");
     setValue("telefone", cliente.Telefone || "");
+    setValue("telefoneFixo", cliente.TelefoneFixo || "");
     setValue("endereco", cliente.Endereço || "");
     setValue("complemento", cliente.Complemento || "");
     setValue("cidade", cliente.Cidade || "");

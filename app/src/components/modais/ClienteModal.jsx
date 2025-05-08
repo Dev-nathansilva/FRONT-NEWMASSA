@@ -207,10 +207,8 @@ export default function ClienteModal({
               <Field.ErrorText>{errors.telefone?.message}</Field.ErrorText>
             </Field.Root>
 
-            <Field.Root required invalid={!!errors.telefonefixo}>
-              <Field.Label>
-                Telefone Fixo <Field.RequiredIndicator />
-              </Field.Label>
+            <Field.Root invalid={!!errors.telefonefixo}>
+              <Field.Label>Telefone Fixo</Field.Label>
               <Controller
                 name="telefonefixo"
                 control={control}

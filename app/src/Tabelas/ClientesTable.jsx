@@ -261,6 +261,7 @@ export default function ClientesTable({
         Status: cliente.status,
         Email: cliente.email,
         Telefone: cliente.telefone,
+        TelefoneFixo: cliente.telefoneFixo,
         "Inscrição Estadual": cliente.inscricaoEstadual,
         "Data de Cadastro": formatarData(cliente.dataCadastro),
         dataCadastroRaw: cliente.dataCadastro,
