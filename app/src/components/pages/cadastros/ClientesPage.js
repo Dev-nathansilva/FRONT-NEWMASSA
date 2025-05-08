@@ -162,7 +162,7 @@ export default function ClientesPage() {
     setValue("documento", cliente["CPF/CNPJ"] || "");
     setValue("email", cliente.Email || "");
     setValue("telefone", cliente.Telefone || "");
-    setValue("telefoneFixo", cliente.TelefoneFixo || "");
+    setValue("telefonefixo", cliente.TelefoneFixo || "");
     setValue("endereco", cliente.Endereço || "");
     setValue("complemento", cliente.Complemento || "");
     setValue("cidade", cliente.Cidade || "");
@@ -178,7 +178,7 @@ export default function ClientesPage() {
     if (clienteEditando) {
       setIsModalOpen(true);
       preencherFormulario(clienteEditando);
-      console.log(clienteEditando);
+      console.log("cliente", clienteEditando);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clienteEditando]);
